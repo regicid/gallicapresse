@@ -217,6 +217,7 @@ get_data <- function(mot,from,to){
       borne2=as.Date.character(str_c(to,"-12-31"))
       total<-total[total$date>=borne1 & total$date<=borne2,]
       total<-total[is.na(total$date)==FALSE,]
+      total<-total[order(total$date),]
       #####DETERMINATION DES PRINCIPAUX TITRES DE PRESSE
       top_titres<-slice_head(presse,n=10)
       
