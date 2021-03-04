@@ -44,16 +44,36 @@ Plot4 <- function(data,input){
   return(plot4)
 }
 Plot5 <- function(data,input){
-  tableau = data[["tableau2"]]
-  plot5<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
-  plot5<-layout(plot5, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  villes = data[["villes"]]
+  rownames(villes)<-NULL
+  villes$freq<-villes$count/sum(villes$count)
+  villes1<-slice_head(villes,n=10)
+  villes1<-add_row(villes1,city="Autre",count=sum(villes$count)-sum(villes1$count),freq=1-sum(villes1$freq))
+  plot5<-plot_ly(x=~villes1$count,y=reorder(villes1$city,villes1$count),type="bar")
+  plot5<-layout(plot5, title="Origine géographique des occurrences",xaxis=list(title="Nombre d'occurrences par ville"))
   return(plot5)
 }
 Plot6 <- function(data,input){
-  tableau = data[["tableau2"]]
-  plot6<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
-  plot6<-layout(plot6, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  villes = data[["villes"]]
+  rownames(villes)<-NULL
+  villes$freq<-villes$count/sum(villes$count)
+  villes1<-slice_head(villes,n=10)
+  villes1<-add_row(villes1,city="Autre",count=sum(villes$count)-sum(villes1$count),freq=1-sum(villes1$freq))
+  plot6<-plot_ly(x=~villes1$freq,y=reorder(villes1$city,villes1$freq),type="bar")
+  plot6<-layout(plot6, title="Origine géographique des occurrences",xaxis=list(title="Proportion d'occurrences par ville"))
   return(plot6)
+}
+Plot7 <- function(data,input){
+  tableau = data[["tableau2"]]
+  plot7<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  return(plot7)
+}
+Plot8 <- function(data,input){
+  tableau = data[["tableau2"]]
+  plot8<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  return(plot8)
 }
 get_data <- function(mot,from,to){
   progress <- shiny::Progress$new()
@@ -274,7 +294,11 @@ ui <- navbarPage("Gallicapresse",
                                                     p(""),
                                                     plotlyOutput("plot5"),
                                                     p(""),
-                                                    plotlyOutput("plot6")))),
+                                                    plotlyOutput("plot6"),
+                                                    p(""),
+                                                    plotlyOutput("plot7"),
+                                                    p(""),
+                                                    plotlyOutput("plot8")))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
 
@@ -290,11 +314,13 @@ server <- function(input, output){
     output$plot2 <- renderPlotly({Plot2(df,input)})
     output$plot4 <- renderPlotly({Plot4(df,input)})
     output$plot6 <- renderPlotly({Plot6(df,input)})
+    output$plot8 <- renderPlotly({Plot8(df,input)})
     # }
     # else{
       output$plot1 <- renderPlotly({Plot1(df,input)})
       output$plot3 <- renderPlotly({Plot3(df,input)})
       output$plot5 <- renderPlotly({Plot5(df,input)})
+      output$plot7 <- renderPlotly({Plot7(df,input)})
     # }
    
     output$downloadData <- downloadHandler(
