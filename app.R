@@ -263,7 +263,7 @@ get_data <- function(mot,from,to){
         }
       }
       total_bis$principales_villes<-as.factor(total_bis$principales_villes)
-      
+      total_bis<-distinct(total_bis)
 
       data=list(total,presse,total_bis,villes)
       names(data) = c("tableau","presse","tableau2","villes")
