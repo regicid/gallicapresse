@@ -7,6 +7,7 @@ library(dplyr)
 library(xml2)
 library(markdown)
 library(shinythemes)
+library(tidyr)
 data = list()
 
 
@@ -41,6 +42,18 @@ Plot4 <- function(data,input){
   plot4<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
   plot4<-layout(plot4, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot4)
+}
+Plot5 <- function(data,input){
+  tableau = data[["tableau2"]]
+  plot5<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot5<-layout(plot5, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  return(plot5)
+}
+Plot6 <- function(data,input){
+  tableau = data[["tableau2"]]
+  plot6<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot6<-layout(plot6, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  return(plot6)
 }
 get_data <- function(mot,from,to){
   progress <- shiny::Progress$new()
@@ -193,12 +206,45 @@ get_data <- function(mot,from,to){
         {
           total$principaux_titres[i]<-as.character(total$title[i])
         }
-        #else {rapport$principaux_titres[i]<-as.character("Autre")}
       }
       total$principaux_titres<-as.factor(total$principaux_titres)
       
-      data=list(total,presse)
-      names(data) = c("tableau","presse")
+      #####COMPTAGE PAR VILLES
+      total_bis<-total
+      total_bis<-total_bis %>%
+        mutate(publisher = strsplit(as.character(publisher), ",")) %>%
+        unnest() %>%
+        filter(publisher != "") %>%
+        select(date,identifier,publisher,title,ark,principaux_titres)
+      total_bis$publisher<-str_remove(total_bis$publisher,"^ ")
+      villes<-as.data.frame(unique(total_bis$publisher))
+      colnames(villes)<-c("city")
+      villes$city<-as.character(villes$city)
+      villes$count<-NA
+      for (i in 1:length(villes$city)) 
+      {
+        villes$count[i]<-sum(str_count(total_bis$publisher,villes$city[i]))
+      }
+      villes<-villes[order(villes$count,decreasing = TRUE),]
+      total_bis$publisher<-as.factor(total_bis$publisher)
+      
+      
+      #####DETERMINATION DES PRINCIPALES VILLES
+      top_villes<-slice_head(villes,n=10)
+      
+      total_bis$principales_villes<-"Autre"
+      for (i in 1:length(total_bis$publisher)) 
+      {
+        if(sum(as.numeric(total_bis$publisher[i]==top_villes$city))==1)
+        {
+          total_bis$principales_villes[i]<-as.character(total_bis$publisher[i])
+        }
+      }
+      total_bis$principales_villes<-as.factor(total_bis$principales_villes)
+      
+
+      data=list(total,presse,total_bis,villes)
+      names(data) = c("tableau","presse","tableau2","villes")
   return(data)}
 
 
@@ -218,14 +264,17 @@ ui <- navbarPage("Gallicapresse",
                                             downloadButton('downloadPlot', 'Télécharger le graphique interactif')
                                           ),
                                           
-                                          mainPanel(plotlyOutput("plot"),
+                                          mainPanel(plotlyOutput("plot1"),
                                                     p(""),
                                                     plotlyOutput("plot2"),
                                                     p(""),
                                                     plotlyOutput("plot3"),
                                                     p(""),
                                                     plotlyOutput("plot4"),
-                                                    headerPanel("")))),
+                                                    p(""),
+                                                    plotlyOutput("plot5"),
+                                                    p(""),
+                                                    plotlyOutput("plot6")))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
 
@@ -240,10 +289,12 @@ server <- function(input, output){
     # if(input$relative){
     output$plot2 <- renderPlotly({Plot2(df,input)})
     output$plot4 <- renderPlotly({Plot4(df,input)})
+    output$plot6 <- renderPlotly({Plot6(df,input)})
     # }
     # else{
-      output$plot <- renderPlotly({Plot1(df,input)})
+      output$plot1 <- renderPlotly({Plot1(df,input)})
       output$plot3 <- renderPlotly({Plot3(df,input)})
+      output$plot5 <- renderPlotly({Plot5(df,input)})
     # }
    
     output$downloadData <- downloadHandler(
