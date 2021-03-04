@@ -213,14 +213,14 @@ ui <- navbarPage("Gallicapresse",
                                             numericInput("beginning","Début",1914),
                                             numericInput("end","Fin",1920),
                                             actionButton("do","Générer le graphique"),
-                                            checkboxInput("relative1", "Afficher les résultats en valeurs relatives", value = FALSE),
+                                            checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
                                             downloadButton('downloadData', 'Télécharger les données'),
                                             downloadButton('downloadPlot', 'Télécharger le graphique interactif')
                                           ),
                                           
                                           mainPanel(plotlyOutput("plot"),
                                                     p(""),
-                                                    conditionalPanel(condition = "input.relative1==TRUE",plotlyOutput("plot2")),
+                                                    plotlyOutput("plot2"),
                                                     p(""),
                                                     plotlyOutput("plot3"),
                                                     p(""),
@@ -237,10 +237,15 @@ server <- function(input, output){
     datasetInput <- reactive({
       data$tableau})
     df = get_data(input$mot,input$beginning,input$end)
-    output$plot <- renderPlotly({Plot1(df,input)})
+    # if(input$relative){
     output$plot2 <- renderPlotly({Plot2(df,input)})
-    output$plot3 <- renderPlotly({Plot3(df,input)})
     output$plot4 <- renderPlotly({Plot4(df,input)})
+    # }
+    # else{
+      output$plot <- renderPlotly({Plot1(df,input)})
+      output$plot3 <- renderPlotly({Plot3(df,input)})
+    # }
+   
     output$downloadData <- downloadHandler(
       filename = function() {
         paste('data-', Sys.Date(), '.csv', sep='')
