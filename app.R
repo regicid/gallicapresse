@@ -28,7 +28,7 @@ Plot2 <- function(data,input){
   presse1<-slice_head(presse,n=10)
   presse1<-add_row(presse1,titre="Autre",count=sum(presse$count)-sum(presse1$count),freq=1-sum(presse1$freq))
   plot2<-plot_ly(x=~presse1$freq,y=reorder(presse1$titre,presse1$freq),type="bar")
-  plot2<-layout(plot2, title="Origine des occurrences",xaxis=list(title="Proportion d'occurrences par journal"))
+  plot2<-layout(plot2, title="Origine des occurrences",xaxis=list(title="Proportion d'occurrences par journal",tickformat = ".1%"))
   return(plot2)
 }
 Plot3 <- function(data,input){
@@ -60,7 +60,7 @@ Plot6 <- function(data,input){
   villes1<-slice_head(villes,n=10)
   villes1<-add_row(villes1,city="Autre",count=sum(villes$count)-sum(villes1$count),freq=1-sum(villes1$freq))
   plot6<-plot_ly(x=~villes1$freq,y=reorder(villes1$city,villes1$freq),type="bar")
-  plot6<-layout(plot6, title="Origine géographique des occurrences",xaxis=list(title="Proportion d'occurrences par ville"))
+  plot6<-layout(plot6, title="Origine géographique des occurrences",xaxis=list(title="Proportion d'occurrences par ville",tickformat = ".1%"))
   return(plot6)
 }
 Plot7 <- function(data,input){
@@ -100,17 +100,11 @@ get_data <- function(mot,from,to){
       i=1
       page<-function(i)
       {
-        if(doc_type==1)
-        {
+
           beginning=str_c(from,"/01/01")
           end=str_c(to,"/12/31")
           url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
-        }
-        
-        if(doc_type==2){
-          url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&version=1.2&startRecord=0&maximumRecords=50&startRecord=",i,"&collapsing=true&exactSearch=true&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22monographie%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",from,"%22%20and%20gallicapublication_date%3C=%22",to,"%22)&suggest=10&keywords=",mot1,or_end)
-          
-        }
+  
         read_xml(url)
       }
       
@@ -176,7 +170,9 @@ get_data <- function(mot,from,to){
           tidyr::spread(var, value) %>% 
           select(-.name)
       }
-      for (h in 1:nmax) {
+      h=1
+      tot_df<-h%>%parse_gallica
+      for (h in 2:nmax) {
         ligne<-h%>%parse_gallica
         tot_df<-bind_rows(tot_df,ligne)
         progress$inc((h/nmax), detail = paste("Traitement des données",as.integer((h/nmax)*100),"%"))
@@ -184,7 +180,7 @@ get_data <- function(mot,from,to){
       
     
       total<-tot_df
-      total<-total[,c(3,5,7,11)]
+      total<-select(total,date,identifier,publisher,title)
       total$title<-str_replace(total$title,"-"," ")
       total$title<-str_remove_all(total$title,"[\\p{Punct}&&[^']].+")
       total$publisher<-str_replace_all(total$publisher,"-"," ")
@@ -210,6 +206,11 @@ get_data <- function(mot,from,to){
       }
       presse<-presse[order(presse$count,decreasing = TRUE),]
       total$title<-as.factor(total$title)
+      
+      for (i in 1:length(total$date)) {
+        if (str_length(total$date[i])==7){total$date[i]<-str_c(total$date[i],"-01")}
+        }
+      total<-total[str_length(total$date)==10,]
       
       total$date<-as.Date.character(total$date)
       borne1=as.Date.character(str_c(from,"-01-01"))
@@ -274,10 +275,10 @@ ui <- navbarPage("Gallicapresse",
                             tags$style(HTML(".shiny-output-error-validation{color: red;}"))),
                           pageWithSidebar(headerPanel(''),
                                           sidebarPanel(
-                                            textInput("mot","Terme(s) à chercher","Clemenceau"),
+                                            textInput("mot","Terme(s) à chercher","Abel Bonnard"),
                                             p('Utiliser "a+b" pour rechercher a OU b'),
-                                            numericInput("beginning","Début",1914),
-                                            numericInput("end","Fin",1920),
+                                            numericInput("beginning","Début",1913),
+                                            numericInput("end","Fin",1914),
                                             actionButton("do","Générer le graphique"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
                                             downloadButton('downloadData', 'Télécharger les données'),
