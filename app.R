@@ -238,7 +238,22 @@ get_data <- function(mot,from,to){
         unnest() %>%
         filter(publisher != "") %>%
         select(date,identifier,publisher,title,ark,principaux_titres)
-      total_bis$publisher<-str_remove(total_bis$publisher,"^ ")
+      total_bis<-total_bis %>%
+        mutate(publisher = strsplit(as.character(publisher), " puis")) %>%
+        unnest() %>%
+        filter(publisher != "") %>%
+        select(date,identifier,publisher,title,ark,principaux_titres)
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"^ ")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"$ ")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"^([:alpha:] )")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"\\]")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"\\[")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"@")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"^[:punct:]")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"$[:punct:]")
+      total_bis$publisher<-iconv(total_bis$publisher,from="UTF-8",to="ASCII//TRANSLIT")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"^ ")
+      total_bis$publisher<-str_remove_all(total_bis$publisher,"$ ")
       villes<-as.data.frame(unique(total_bis$publisher))
       colnames(villes)<-c("city")
       villes$city<-as.character(villes$city)
