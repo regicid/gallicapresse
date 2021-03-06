@@ -405,28 +405,6 @@ server <- function(input, output){
       content = function(con) {
         write.csv(df$tableau, con)
       })
-    
-    # output$downloadPlot2 <- downloadHandler(
-    #   filename = function() {
-    #     paste('plot-', Sys.Date(), '.html', sep='')
-    #   },
-    #   content = function(con) {
-    #     htmlwidgets::saveWidget(as_widget(Plot2(df,input)), con)
-    #   })
-    # output$downloadPlot3 <- downloadHandler(
-    #   filename = function() {
-    #     paste('plot-', Sys.Date(), '.html', sep='')
-    #   },
-    #   content = function(con) {
-    #     htmlwidgets::saveWidget(as_widget(Plot3(df,input)), con)
-    #   })
-    # output$downloadPlot4 <- downloadHandler(
-    #   filename = function() {
-    #     paste('plot-', Sys.Date(), '.html', sep='')
-    #   },
-    #   content = function(con) {
-    #     htmlwidgets::saveWidget(as_widget(Plot4(df,input)), con)
-    #   })
   })
   
   
