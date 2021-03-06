@@ -297,25 +297,18 @@ ui <- navbarPage("Gallicapresse",
                                             numericInput("end","Fin",1914),
                                             actionButton("do","Générer le graphique"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
-                                            downloadButton('downloadData', 'Télécharger les données'),
-                                            downloadButton('downloadPlot', 'Télécharger le graphique interactif')
+                                            downloadButton('downloadData', 'Télécharger les données')
                                           ),
                                           
                                           mainPanel(plotlyOutput("plot1"),
-                                                    p(""),
+                                                    downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot2"),
-                                                    p(""),
+                                                    downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot3"),
-                                                    p(""),
+                                                    downloadButton('downloadPlot3', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot4"),
-                                                    p(""),
-                                                    plotlyOutput("plot5"),
-                                                    p(""),
-                                                    plotlyOutput("plot6"),
-                                                    p(""),
-                                                    plotlyOutput("plot7"),
-                                                    p(""),
-                                                    plotlyOutput("plot8")))),
+                                                    downloadButton('downloadPlot4', 'Télécharger le graphique interactif')
+                                                    ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
 
@@ -327,19 +320,84 @@ server <- function(input, output){
     datasetInput <- reactive({
       data$tableau})
     df = get_data(input$mot,input$beginning,input$end)
-    # if(input$relative){
-    output$plot2 <- renderPlotly({Plot2(df,input)})
-    output$plot4 <- renderPlotly({Plot4(df,input)})
-    output$plot6 <- renderPlotly({Plot6(df,input)})
-    output$plot8 <- renderPlotly({Plot8(df,input)})
-    # }
-    # else{
-      output$plot1 <- renderPlotly({Plot1(df,input)})
-      output$plot3 <- renderPlotly({Plot3(df,input)})
-      output$plot5 <- renderPlotly({Plot5(df,input)})
-      output$plot7 <- renderPlotly({Plot7(df,input)})
-    # }
-   
+    
+    observeEvent(input$relative,
+                 if(input$relative){
+                    output$plot1 <- renderPlotly({Plot2(df,input)})
+                    output$downloadPlot1 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot2(df,input)), con)
+                      })
+                    
+                    output$plot2 <- renderPlotly({Plot4(df,input)})
+                    output$downloadPlot2 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot4(df,input)), con)
+                      })
+                    
+                    output$plot3 <- renderPlotly({Plot6(df,input)})
+                    output$downloadPlot3 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot6(df,input)), con)
+                      })
+                    
+                    output$plot4 <- renderPlotly({Plot8(df,input)})
+                    output$downloadPlot4 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot8(df,input)), con)
+                      })
+                 }
+                 else{
+                   output$plot1 <- renderPlotly({Plot1(df,input)})
+                   output$downloadPlot1 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot1(df,input)), con)
+                     })
+                   
+                   output$plot2 <- renderPlotly({Plot3(df,input)})
+                   output$downloadPlot2 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot3(df,input)), con)
+                     })
+                   
+                   output$plot3 <- renderPlotly({Plot5(df,input)})
+                   output$downloadPlot3 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot5(df,input)), con)
+                     })
+                   
+                   output$plot4 <- renderPlotly({Plot7(df,input)})
+                   output$downloadPlot4 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot7(df,input)), con)
+                     })
+                 }
+                 )
+    
     output$downloadData <- downloadHandler(
       filename = function() {
         paste('data-', Sys.Date(), '.csv', sep='')
@@ -347,13 +405,28 @@ server <- function(input, output){
       content = function(con) {
         write.csv(df$tableau, con)
       })
-    output$downloadPlot <- downloadHandler(
-      filename = function() {
-        paste('plot-', Sys.Date(), '.html', sep='')
-      },
-      content = function(con) {
-        htmlwidgets::saveWidget(as_widget(Plot(df,input)), con)
-      })
+    
+    # output$downloadPlot2 <- downloadHandler(
+    #   filename = function() {
+    #     paste('plot-', Sys.Date(), '.html', sep='')
+    #   },
+    #   content = function(con) {
+    #     htmlwidgets::saveWidget(as_widget(Plot2(df,input)), con)
+    #   })
+    # output$downloadPlot3 <- downloadHandler(
+    #   filename = function() {
+    #     paste('plot-', Sys.Date(), '.html', sep='')
+    #   },
+    #   content = function(con) {
+    #     htmlwidgets::saveWidget(as_widget(Plot3(df,input)), con)
+    #   })
+    # output$downloadPlot4 <- downloadHandler(
+    #   filename = function() {
+    #     paste('plot-', Sys.Date(), '.html', sep='')
+    #   },
+    #   content = function(con) {
+    #     htmlwidgets::saveWidget(as_widget(Plot4(df,input)), con)
+    #   })
   })
   
   
