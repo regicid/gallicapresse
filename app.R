@@ -75,6 +75,39 @@ Plot8 <- function(data,input){
   plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot8)
 }
+Plot9 <- function(data,input){
+  theme = data[["theme"]]
+  rownames(theme)<-NULL
+  theme$freq<-theme$count/sum(theme$count)
+  theme1<-slice_head(theme,n=10)
+  theme1<-add_row(theme1,thematique="Autre",count=sum(theme$count)-sum(theme1$count),freq=1-sum(theme1$freq))
+  plot9<-plot_ly(x=~theme1$count,y=reorder(theme1$thematique,theme1$count),type="bar")
+  plot9<-layout(plot9, title="Thématique des journaux",xaxis=list(title="Nombre d'occurrences par thématique"))
+  return(plot9)
+}
+Plot10 <- function(data,input){
+  theme = data[["theme"]]
+  rownames(theme)<-NULL
+  theme$freq<-theme$count/sum(theme$count)
+  theme1<-slice_head(theme,n=10)
+  theme1<-add_row(theme1,thematique="Autre",count=sum(theme$count)-sum(theme1$count),freq=1-sum(theme1$freq))
+  plot10<-plot_ly(x=~theme1$freq,y=reorder(theme1$thematique,theme1$freq),type="bar")
+  plot10<-layout(plot10, title="Thématique des journaux",xaxis=list(title="Proportion d'occurrences par thématique",tickformat = ".1%"))
+  return(plot10)
+}
+Plot11 <- function(data,input){
+  tableau = data[["tableau"]]
+  plot11<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  return(plot11)
+}
+Plot12 <- function(data,input){
+  tableau = data[["tableau"]]
+  plot12<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  return(plot12)
+}
+
 get_data <- function(mot,from,to){
   progress <- shiny::Progress$new()
   on.exit(progress$close())
@@ -180,7 +213,10 @@ get_data <- function(mot,from,to){
       
     
       total<-tot_df
-      total<-select(total,date,identifier,publisher,title)
+      total<-select(total,date,identifier,publisher,title,relation)
+      total$relation<-str_remove_all(total$relation,".+-- ")
+      total$relation<-str_remove_all(total$relation,"https://gallica.bnf.fr/ark:/12148/")
+      total$relation<-str_replace_all(total$relation,"/","_")
       total$title<-str_replace(total$title,"-"," ")
       total$title<-str_remove_all(total$title,"[\\p{Punct}&&[^']].+")
       total$publisher<-str_replace_all(total$publisher,"-"," ")
@@ -280,8 +316,41 @@ get_data <- function(mot,from,to){
       total_bis$principales_villes<-as.factor(total_bis$principales_villes)
       total_bis<-distinct(total_bis)
 
-      data=list(total,presse,total_bis,villes)
-      names(data) = c("tableau","presse","tableau2","villes")
+      #####THEMES DES JOURNAUX
+      liste<-read.csv("liste_journaux_gallica_quotidiens.csv",encoding = "UTF-8")
+      liste<-select(liste,ark,sdewey_nom,sdewey_nom2)
+      colnames(liste)<-c("relation","sdewey_nom","sdewey_nom2")
+      total<-left_join(total,liste,"relation")
+      total$sdewey_nom[is.na(total$sdewey_nom)]<-""
+      total$sdewey_nom2[is.na(total$sdewey_nom2)]<-""
+      #####COMPTAGE PAR THEMATIQUE
+      theme<-as.data.frame(unique(total$sdewey_nom))
+      colnames(theme)<-c("thematique")
+      theme$thematique<-as.character(theme$thematique)
+      theme$count<-NA
+      for (i in 1:length(theme$thematique)) 
+      {
+        theme$count[i]<-sum(str_count(total$sdewey_nom,theme$thematique[i]))
+      }
+      theme<-theme[order(theme$count,decreasing = TRUE),]
+      total$sdewey_nom<-as.factor(total$sdewey_nom)
+      total$sdewey_nom2<-as.factor(total$sdewey_nom2)
+      #####DETERMINATION DES PRINCIPAUX THEMES
+      top_themes<-slice_head(theme,n=10)
+      
+      total$principaux_themes<-"Autre"
+      for (i in 1:length(total$sdewey_nom)) 
+      {
+        if(sum(as.numeric(total$sdewey_nom[i]==top_themes$thematique))==1)
+        {
+          total$principaux_themes[i]<-as.character(total$sdewey_nom[i])
+        }
+      }
+      total$principaux_themes<-as.factor(total$principaux_themes)
+
+      
+      data=list(total,presse,theme,total_bis,villes)
+      names(data) = c("tableau","presse","theme","tableau2","villes")
   return(data)}
 
 
@@ -307,7 +376,11 @@ ui <- navbarPage("Gallicapresse",
                                                     plotlyOutput("plot3"),
                                                     downloadButton('downloadPlot3', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot4"),
-                                                    downloadButton('downloadPlot4', 'Télécharger le graphique interactif')
+                                                    downloadButton('downloadPlot4', 'Télécharger le graphique interactif'),
+                                                    plotlyOutput("plot5"),
+                                                    downloadButton('downloadPlot5', 'Télécharger le graphique interactif'),
+                                                    plotlyOutput("plot6"),
+                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif')
                                                     ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
@@ -358,6 +431,24 @@ server <- function(input, output){
                       content = function(con) {
                         htmlwidgets::saveWidget(as_widget(Plot8(df,input)), con)
                       })
+                    
+                    output$plot5 <- renderPlotly({Plot10(df,input)})
+                    output$downloadPlot5 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot10(df,input)), con)
+                      })
+                    
+                    output$plot6 <- renderPlotly({Plot12(df,input)})
+                    output$downloadPlot6 <- downloadHandler(
+                      filename = function() {
+                        paste('plot-', Sys.Date(), '.html', sep='')
+                      },
+                      content = function(con) {
+                        htmlwidgets::saveWidget(as_widget(Plot12(df,input)), con)
+                      })
                  }
                  else{
                    output$plot1 <- renderPlotly({Plot1(df,input)})
@@ -394,6 +485,24 @@ server <- function(input, output){
                      },
                      content = function(con) {
                        htmlwidgets::saveWidget(as_widget(Plot7(df,input)), con)
+                     })
+                   
+                   output$plot5 <- renderPlotly({Plot9(df,input)})
+                   output$downloadPlot5 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot9(df,input)), con)
+                     })
+                   
+                   output$plot6 <- renderPlotly({Plot11(df,input)})
+                   output$downloadPlot6 <- downloadHandler(
+                     filename = function() {
+                       paste('plot-', Sys.Date(), '.html', sep='')
+                     },
+                     content = function(con) {
+                       htmlwidgets::saveWidget(as_widget(Plot11(df,input)), con)
                      })
                  }
                  )
