@@ -20,7 +20,7 @@ Plot1 <- function(data,input){
   presse1<-slice_head(presse,n=10)
   presse1<-add_row(presse1,titre="Autre",count=sum(presse$count)-sum(presse1$count),freq=1-sum(presse1$freq))
   plot1<-plot_ly(x=~presse1$count,y=reorder(presse1$titre,presse1$count),type="bar")
-  plot1<-layout(plot1, title="Origine des occurrences",xaxis=list(title="Nombre d'occurrences par journal"))
+  plot1<-layout(plot1, title="Origine des occurrences : les dix principaux journaux d'origine",xaxis=list(title="Nombre d'occurrences par journal"))
   return(plot1)
 }
 Plot2 <- function(data,input){
@@ -30,18 +30,20 @@ Plot2 <- function(data,input){
   presse1<-slice_head(presse,n=10)
   presse1<-add_row(presse1,titre="Autre",count=sum(presse$count)-sum(presse1$count),freq=1-sum(presse1$freq))
   plot2<-plot_ly(x=~presse1$freq,y=reorder(presse1$titre,presse1$freq),type="bar")
-  plot2<-layout(plot2, title="Origine des occurrences",xaxis=list(title="Proportion d'occurrences par journal",tickformat = ".1%"))
+  plot2<-layout(plot2, title="Origine des occurrences : les dix principaux journaux d'origine",xaxis=list(title="Proportion d'occurrences par journal",tickformat = ".1%"))
   return(plot2)
 }
 Plot3 <- function(data,input){
   tableau = data[["tableau"]]
-  plot3<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principaux_titres)
+  plot3<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_titres,colors="Dark2",hoverinfo="text")
   plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot3)
 }
 Plot4 <- function(data,input){
   tableau = data[["tableau"]]
-  plot4<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principaux_titres)
+  plot4<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_titres,colors="Dark2",hoverinfo="text")
   plot4<-layout(plot4, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot4)
 }
@@ -52,7 +54,7 @@ Plot5 <- function(data,input){
   villes1<-slice_head(villes,n=10)
   villes1<-add_row(villes1,city="Autre",count=sum(villes$count)-sum(villes1$count),freq=1-sum(villes1$freq))
   plot5<-plot_ly(x=~villes1$count,y=reorder(villes1$city,villes1$count),type="bar")
-  plot5<-layout(plot5, title="Origine géographique des occurrences",xaxis=list(title="Nombre d'occurrences par ville"))
+  plot5<-layout(plot5, title="Origine géographique des occurrences : les dix principales villes de publication",xaxis=list(title="Nombre d'occurrences par ville"))
   return(plot5)
 }
 Plot6 <- function(data,input){
@@ -62,18 +64,20 @@ Plot6 <- function(data,input){
   villes1<-slice_head(villes,n=10)
   villes1<-add_row(villes1,city="Autre",count=sum(villes$count)-sum(villes1$count),freq=1-sum(villes1$freq))
   plot6<-plot_ly(x=~villes1$freq,y=reorder(villes1$city,villes1$freq),type="bar")
-  plot6<-layout(plot6, title="Origine géographique des occurrences",xaxis=list(title="Proportion d'occurrences par ville",tickformat = ".1%"))
+  plot6<-layout(plot6, title="Origine géographique des occurrences : les dix principales villes de publication",xaxis=list(title="Proportion d'occurrences par ville",tickformat = ".1%"))
   return(plot6)
 }
 Plot7 <- function(data,input){
   tableau = data[["tableau2"]]
-  plot7<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principales_villes)
+  plot7<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principales_villes,colors="Dark2",hoverinfo="text")
   plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot7)
 }
 Plot8 <- function(data,input){
   tableau = data[["tableau2"]]
-  plot8<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principales_villes)
+  plot8<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principales_villes,colors="Dark2",hoverinfo="text")
   plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot8)
 }
@@ -84,7 +88,7 @@ Plot9 <- function(data,input){
   theme1<-slice_head(theme,n=10)
   theme1<-add_row(theme1,thematique="Autre",count=sum(theme$count)-sum(theme1$count),freq=1-sum(theme1$freq))
   plot9<-plot_ly(x=~theme1$count,y=reorder(theme1$thematique,theme1$count),type="bar")
-  plot9<-layout(plot9, title="Thématique des journaux",xaxis=list(title="Nombre d'occurrences par thématique"))
+  plot9<-layout(plot9, title="Thématique des journaux : les dix principaux thèmes (Dewey)",xaxis=list(title="Nombre d'occurrences par thématique"))
   return(plot9)
 }
 Plot10 <- function(data,input){
@@ -94,18 +98,20 @@ Plot10 <- function(data,input){
   theme1<-slice_head(theme,n=10)
   theme1<-add_row(theme1,thematique="Autre",count=sum(theme$count)-sum(theme1$count),freq=1-sum(theme1$freq))
   plot10<-plot_ly(x=~theme1$freq,y=reorder(theme1$thematique,theme1$freq),type="bar")
-  plot10<-layout(plot10, title="Thématique des journaux",xaxis=list(title="Proportion d'occurrences par thématique",tickformat = ".1%"))
+  plot10<-layout(plot10, title="Thématique des journaux : les dix principaux thèmes (Dewey)",xaxis=list(title="Proportion d'occurrences par thématique",tickformat = ".1%"))
   return(plot10)
 }
 Plot11 <- function(data,input){
   tableau = data[["tableau"]]
-  plot11<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principaux_themes)
+  plot11<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_themes,colors="Dark2",hoverinfo='text')
   plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot11)
 }
 Plot12 <- function(data,input){
   tableau = data[["tableau"]]
-  plot12<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  tableau$hovers<-str_c(tableau$principaux_themes)
+  plot12<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_themes,colors="Dark2",hoverinfo='text')
   plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot12)
 }
@@ -160,7 +166,7 @@ prepare_data <- function(mot,from,to){
     }
     progress$inc(50/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
   }
-  progress$set(message = "Patience...", value = 0)
+  progress$set(message = "Cette étape va être longue...", value = 0)
   xml_to_df <- function(doc, ns = xml_ns(doc)) {
     split_by <- function(.x, .f, ...) {
       vals <- map(.x, .f, ...)
@@ -221,6 +227,8 @@ prepare_data <- function(mot,from,to){
   }
   return(tot_df)
 }
+
+
 get_data<-function (tot_df,mot,from,to){
   total<-tot_df
   total<-select(total,date,identifier,publisher,title,relation)
@@ -245,6 +253,15 @@ get_data<-function (tot_df,mot,from,to){
   presse<-as.data.frame(unique(total$title))
   colnames(presse)<-c("titre")
   presse$titre<-as.character(presse$titre)
+  presse<-presse[presse$titre!="",]
+  presse<-as.data.frame(presse)
+  colnames(presse)<-c("titre")
+  presse<-presse[presse$titre!=" ",]
+  presse<-as.data.frame(presse)
+  colnames(presse)<-c("titre")
+  presse<-presse[is.na(presse$titre)==FALSE,]
+  presse<-as.data.frame(presse)
+  colnames(presse)<-c("titre")
   presse$count<-NA
   for (i in 1:length(presse$titre)) 
   {
@@ -300,6 +317,7 @@ get_data<-function (tot_df,mot,from,to){
   total_bis$publisher<-iconv(total_bis$publisher,from="UTF-8",to="ASCII//TRANSLIT")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"^ ")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"$ ")
+  total_bis<-distinct(total_bis)
   villes<-as.data.frame(unique(total_bis$publisher))
   colnames(villes)<-c("city")
   villes$city<-as.character(villes$city)
@@ -332,9 +350,12 @@ get_data<-function (tot_df,mot,from,to){
   colnames(liste)<-c("relation","sdewey_nom","sdewey_nom2")
   total<-left_join(total,liste,"relation")
   total$sdewey_nom<-as.character(total$sdewey_nom)
-  total$sdewey_nom[is.na(total$sdewey_nom)]<-""
-  total$sdewey_nom2[is.na(total$sdewey_nom2)]<-""
+  total$sdewey_nom[total$sdewey_nom==""]<-"N/A"
+  total$sdewey_nom2[total$sdewey_nom2==""]<-"N/A"
+  total$sdewey_nom[is.na(total$sdewey_nom)]<-"N/A"
+  total$sdewey_nom2[is.na(total$sdewey_nom2)]<-"N/A"
   total$sdewey_nom<-as.factor(total$sdewey_nom)
+  total$sdewey_nom2<-as.factor(total$sdewey_nom2)
   #####COMPTAGE PAR THEMATIQUE
   theme<-as.data.frame(unique(total$sdewey_nom))
   colnames(theme)<-c("thematique")
@@ -345,8 +366,6 @@ get_data<-function (tot_df,mot,from,to){
     theme$count[i]<-sum(str_count(total$sdewey_nom,theme$thematique[i]))
   }
   theme<-theme[order(theme$count,decreasing = TRUE),]
-  total$sdewey_nom<-as.factor(total$sdewey_nom)
-  total$sdewey_nom2<-as.factor(total$sdewey_nom2)
   #####DETERMINATION DES PRINCIPAUX THEMES
   top_themes<-slice_head(theme,n=10)
   
@@ -393,12 +412,12 @@ ui <- navbarPage("Gallicapresse",
                                                     downloadButton('downloadPlot3', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot4"),
                                                     downloadButton('downloadPlot4', 'Télécharger le graphique interactif'),
+                                                    leafletOutput("plot7"),
+                                                    downloadButton('downloadPlot7', 'Télécharger la carte interactive'),
                                                     plotlyOutput("plot5"),
                                                     downloadButton('downloadPlot5', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot6"),
-                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif'),
-                                                    leafletOutput("plot7"),
-                                                    downloadButton('downloadPlot7', 'Télécharger la carte interactive')
+                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif')
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
@@ -549,7 +568,7 @@ server <- function(input, output){
         paste('data-', Sys.Date(), '.csv', sep='')
       },
       content = function(con) {
-        write.csv(df$tableau, con)
+        write.csv(df$tableau, con, fileEncoding = "UTF-8",row.names = F)
       })
   })
   
