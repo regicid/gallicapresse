@@ -9,6 +9,7 @@ library(markdown)
 library(shinythemes)
 library(tidyr)
 library(leaflet.extras)
+library(htmltools)
 data = list()
 
 
@@ -113,7 +114,7 @@ Plot13<-function(data,input){
   
   leaflet(tableau) %>% addProviderTiles(providers$Stamen.Toner) %>%
     setView( lng=2.25, lat=47.15, 5 ) %>% addMarkers(
-    clusterOptions = markerClusterOptions())
+    clusterOptions = markerClusterOptions(), popup = ~htmlEscape(paste(title," ", date,"\n",identifier)))
 }
 
 prepare_data <- function(mot,from,to){
