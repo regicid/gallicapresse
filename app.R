@@ -157,7 +157,7 @@ prepare_data <- function(mot,from,to){
     for (l in xml2::xml_children(temp)){
       xml2::xml_add_child(tot, l)
     }
-    progress$inc(j/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
+    progress$inc(50/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
   }
   progress$set(message = "Patience...", value = 0)
   xml_to_df <- function(doc, ns = xml_ns(doc)) {
@@ -216,7 +216,7 @@ prepare_data <- function(mot,from,to){
   for (h in 2:nmax) {
     ligne<-h%>%parse_gallica
     tot_df<-bind_rows(tot_df,ligne)
-    progress$inc((h/nmax), detail = paste("Traitement des données",as.integer((h/nmax)*100),"%"))
+    progress$inc((1/nmax), detail = paste("Traitement des données",as.integer((h/nmax)*100),"%"))
   }
   return(tot_df)
 }
