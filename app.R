@@ -509,7 +509,7 @@ server <- function(input, output){
   #Affichage au démarrage :
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
   df_exemple = reactive({get_data(tot_df,input$mot,input$beginning,input$end)})
-  display(df_exemple)
+  display(df_exemple())
   
   observeEvent(input$do,{
     datasetInput <- reactive({
