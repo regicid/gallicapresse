@@ -8,6 +8,7 @@ library(xml2)
 library(markdown)
 library(shinythemes)
 library(tidyr)
+library(leaflet.extras)
 data = list()
 
 
@@ -106,6 +107,13 @@ Plot12 <- function(data,input){
   plot12<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
   plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot12)
+}
+Plot13<-function(data,input){
+  tableau<-data[["tableau2"]]
+  
+  leaflet(tableau) %>% addProviderTiles(providers$Stamen.Toner) %>%
+    setView( lng=2.25, lat=47.15, 5 ) %>% addMarkers(
+    clusterOptions = markerClusterOptions())
 }
 
 prepare_data <- function(mot,from,to){
@@ -349,6 +357,9 @@ get_data<-function (tot_df,mot,from,to){
   }
   total$principaux_themes<-as.factor(total$principaux_themes)
   
+  #Ajout du géocodage
+  geocodage<-read.csv("villes_geocodes.csv",encoding="UTF-8")
+  total_bis<-left_join(total_bis,geocodage,"publisher")
   
   data=list(total,presse,theme,total_bis,villes)
   names(data) = c("tableau","presse","theme","tableau2","villes")
@@ -382,7 +393,9 @@ ui <- navbarPage("Gallicapresse",
                                                     plotlyOutput("plot5"),
                                                     downloadButton('downloadPlot5', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot6"),
-                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif')
+                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif'),
+                                                    leafletOutput("plot7"),
+                                                    downloadButton('downloadPlot7', 'Télécharger la carte interactive')
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
@@ -394,7 +407,7 @@ server <- function(input, output){
   #Fonction d'affichage :
   display<-function(df)
   {observeEvent(input$relative,
-                if(input$relative){
+                {if(input$relative){
                   output$plot1 <- renderPlotly({Plot2(df,input)})
                   output$downloadPlot1 <- downloadHandler(
                     filename = function() {
@@ -504,7 +517,16 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot11(df,input)), con)
                     })
                 }
-  )}
+                
+                output$plot7 <- renderLeaflet({Plot13(df,input)})
+                output$downloadPlot7 <- downloadHandler(
+                  filename = function() {
+                    paste('plot-', Sys.Date(), '.html', sep='')
+                  },
+                  content = function(con) {
+                    htmlwidgets::saveWidget(as_widget(Plot13(df,input)), con)
+                  })
+  })}
   
   #Affichage au démarrage :
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
