@@ -251,7 +251,7 @@ get_data<-function (tot_df,mot,from,to){
   }
   presse<-presse[order(presse$count,decreasing = TRUE),]
   total$title<-as.factor(total$title)
-  
+  total$date<-as.character(total$date)  
   for (i in 1:length(total$date)) {
     if (str_length(total$date[i])==7){total$date[i]<-str_c(total$date[i],"-01")}
   }
