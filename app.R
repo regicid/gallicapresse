@@ -262,6 +262,7 @@ get_data<-function (tot_df,mot,from,to){
   presse<-presse[is.na(presse$titre)==FALSE,]
   presse<-as.data.frame(presse)
   colnames(presse)<-c("titre")
+  presse$titre<-as.character(presse$titre)
   presse$count<-NA
   for (i in 1:length(presse$titre)) 
   {
