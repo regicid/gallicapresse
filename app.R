@@ -330,8 +330,10 @@ get_data<-function (tot_df,mot,from,to){
   liste<-select(liste,ark,sdewey_nom,sdewey_nom2)
   colnames(liste)<-c("relation","sdewey_nom","sdewey_nom2")
   total<-left_join(total,liste,"relation")
+  total$sdewey_nom<-as.character(total$sdewey_nom)
   total$sdewey_nom[is.na(total$sdewey_nom)]<-""
   total$sdewey_nom2[is.na(total$sdewey_nom2)]<-""
+  total$sdewey_nom<-as.factor(total$sdewey_nom)
   #####COMPTAGE PAR THEMATIQUE
   theme<-as.data.frame(unique(total$sdewey_nom))
   colnames(theme)<-c("thematique")
