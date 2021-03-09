@@ -503,6 +503,7 @@ ui <- navbarPage("Gallicapresse",
                                             p(textOutput("message")),
                                             actionButton("do","Générer les graphiques"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
+                                            radioButtons("structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 1),
                                             downloadButton('downloadData', 'Télécharger les données')
                                           ),
                                           
@@ -511,20 +512,8 @@ ui <- navbarPage("Gallicapresse",
                                                     downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot2"),
                                                     downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
-                                                    plotlyOutput("plot3"),
-                                                    downloadButton('downloadPlot3', 'Télécharger le graphique interactif'),
-                                                    plotlyOutput("plot4"),
-                                                    downloadButton('downloadPlot4', 'Télécharger le graphique interactif'),
-                                                    leafletOutput("plot7"),
-                                                    downloadButton('downloadPlot7', 'Télécharger la carte interactive'),
-                                                    plotlyOutput("plot5"),
-                                                    downloadButton('downloadPlot5', 'Télécharger le graphique interactif'),
-                                                    plotlyOutput("plot6"),
-                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif'),
-                                                    plotlyOutput("plot8"),
-                                                    downloadButton('downloadPlot8', 'Télécharger le graphique interactif'),
-                                                    plotlyOutput("plot9"),
-                                                    downloadButton('downloadPlot9', 'Télécharger le graphique interactif')
+                                                    conditionalPanel(condition="input.structure==2",leafletOutput("plot7")),
+                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive'))
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
                  tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
@@ -539,7 +528,9 @@ server <- function(input, output){
   #Fonction d'affichage :
   display<-function(df)
   {observeEvent(input$relative,
-                {if(input$relative){
+                {observeEvent(input$structure,
+                  {
+                  if(input$relative & input$structure==1){
                   output$plot1 <- renderPlotly({Plot2(df,input)})
                   output$downloadPlot1 <- downloadHandler(
                     filename = function() {
@@ -557,9 +548,10 @@ server <- function(input, output){
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot4(df,input)), con)
                     })
-                  
-                  output$plot3 <- renderPlotly({Plot6(df,input)})
-                  output$downloadPlot3 <- downloadHandler(
+                  }
+                    else if(input$relative & input$structure==2){
+                  output$plot1 <- renderPlotly({Plot6(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -567,17 +559,18 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot6(df,input)), con)
                     })
                   
-                  output$plot4 <- renderPlotly({Plot8(df,input)})
-                  output$downloadPlot4 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot8(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot8(df,input)), con)
                     })
-                  
-                  output$plot5 <- renderPlotly({Plot10(df,input)})
-                  output$downloadPlot5 <- downloadHandler(
+                    }
+                    else if(input$relative & input$structure==3){
+                  output$plot1 <- renderPlotly({Plot10(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -585,17 +578,18 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot10(df,input)), con)
                     })
                   
-                  output$plot6 <- renderPlotly({Plot12(df,input)})
-                  output$downloadPlot6 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot12(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot12(df,input)), con)
                     })
-                  
-                  output$plot8 <- renderPlotly({Plot15(df,input)})
-                  output$downloadPlot8 <- downloadHandler(
+                    }
+                  else if(input$relative & input$structure==4){
+                  output$plot1 <- renderPlotly({Plot15(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -603,8 +597,8 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot15(df,input)), con)
                     })
                   
-                  output$plot9 <- renderPlotly({Plot17(df,input)})
-                  output$downloadPlot9 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot17(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -612,7 +606,7 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot17(df,input)), con)
                     })
                 }
-                else{
+                else if(input$relative==FALSE & input$structure==1){
                   output$plot1 <- renderPlotly({Plot1(df,input)})
                   output$downloadPlot1 <- downloadHandler(
                     filename = function() {
@@ -630,9 +624,10 @@ server <- function(input, output){
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot3(df,input)), con)
                     })
-                  
-                  output$plot3 <- renderPlotly({Plot5(df,input)})
-                  output$downloadPlot3 <- downloadHandler(
+                }
+                else if(input$relative==FALSE & input$structure==2){
+                  output$plot1 <- renderPlotly({Plot5(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -640,17 +635,26 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot5(df,input)), con)
                     })
                   
-                  output$plot4 <- renderPlotly({Plot7(df,input)})
-                  output$downloadPlot4 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot7(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot7(df,input)), con)
                     })
-                  
-                  output$plot5 <- renderPlotly({Plot9(df,input)})
-                  output$downloadPlot5 <- downloadHandler(
+                  output$plot7 <- renderLeaflet({Plot13(df,input)})
+                  output$downloadPlot7 <- downloadHandler(
+                    filename = function() {
+                      paste('plot-', Sys.Date(), '.html', sep='')
+                    },
+                    content = function(con) {
+                      htmlwidgets::saveWidget(as_widget(Plot13(df,input)), con)
+                    })
+                }
+                else if(input$relative==FALSE & input$structure==3){ 
+                  output$plot1 <- renderPlotly({Plot9(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -658,17 +662,18 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot9(df,input)), con)
                     })
                   
-                  output$plot6 <- renderPlotly({Plot11(df,input)})
-                  output$downloadPlot6 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot11(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot11(df,input)), con)
                     })
-                  
-                  output$plot8 <- renderPlotly({Plot14(df,input)})
-                  output$downloadPlot8 <- downloadHandler(
+                }
+                else if(input$relative==FALSE & input$structure==4){
+                  output$plot1 <- renderPlotly({Plot14(df,input)})
+                  output$downloadPlot1 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -676,8 +681,8 @@ server <- function(input, output){
                       htmlwidgets::saveWidget(as_widget(Plot14(df,input)), con)
                     })
                   
-                  output$plot9 <- renderPlotly({Plot16(df,input)})
-                  output$downloadPlot9 <- downloadHandler(
+                  output$plot2 <- renderPlotly({Plot16(df,input)})
+                  output$downloadPlot2 <- downloadHandler(
                     filename = function() {
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
@@ -686,14 +691,8 @@ server <- function(input, output){
                     })
                 }
                 
-                output$plot7 <- renderLeaflet({Plot13(df,input)})
-                output$downloadPlot7 <- downloadHandler(
-                  filename = function() {
-                    paste('plot-', Sys.Date(), '.html', sep='')
-                  },
-                  content = function(con) {
-                    htmlwidgets::saveWidget(as_widget(Plot13(df,input)), con)
-                  })
+                
+                })
   })}
   
   #Affichage au démarrage :
