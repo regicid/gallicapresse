@@ -510,10 +510,18 @@ ui <- navbarPage("Gallicapresse",
                                           mainPanel(
                                                     plotlyOutput("plot1"),
                                                     downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
+                                                    fluidRow(textOutput("legende1"),align="right"),
+                                                    fluidRow(textOutput("legende2"),align="right"),
+                                                    p(""),
                                                     plotlyOutput("plot2"),
                                                     downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
+                                                    fluidRow(textOutput("legende3"),align="right"),
+                                                    fluidRow(textOutput("legende4"),align="right"),
+                                                    p(""),
                                                     conditionalPanel(condition="input.structure==2",leafletOutput("plot7")),
-                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive'))
+                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive')),
+                                                    conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende5"),align="right")),
+                                                    conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende6"),align="right"))
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
                  tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
@@ -699,6 +707,12 @@ server <- function(input, output){
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
   df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange)})
   display(df_exemple())
+  output$legende1=renderText("Source : gallica.bnf.fr")
+  output$legende2=renderText("Affichage : Gallicapresse par Benjamin Azoulay et Benoît de Courson")
+  output$legende3=renderText("Source : gallica.bnf.fr")
+  output$legende4=renderText("Affichage : Gallicapresse par Benjamin Azoulay et Benoît de Courson")
+  output$legende5=renderText("Source : gallica.bnf.fr")
+  output$legende6=renderText("Affichage : Gallicapresse par Benjamin Azoulay et Benoît de Courson")
   
   recherche<-reactive({input$mot})
   duree<-reactive({input$dateRange})
