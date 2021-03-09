@@ -522,7 +522,8 @@ ui <- navbarPage("Gallicapresse",
                                                     plotlyOutput("plot9"),
                                                     downloadButton('downloadPlot9', 'Télécharger le graphique interactif')
                                           ))),
-                 tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
+                 tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
+                 tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
 )
 
 
