@@ -100,7 +100,7 @@ Plot10 <- function(data,input){
 Plot11 <- function(data,input){
   tableau = data[["tableau"]]
   plot11<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
-  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions",type="date",tickformat = "%b %Y",tickangle="-45"),barmode="stack")
+  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot11)
 }
 Plot12 <- function(data,input){
