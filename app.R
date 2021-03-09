@@ -616,7 +616,7 @@ server <- function(input, output){
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
-                      htmlwidgets::saveWidget(as_widget(Plot16(df,input)), con)
+                      htmlwidgets::saveWidget(as_widget(Plot14(df,input)), con)
                     })
                   
                   output$plot9 <- renderPlotly({Plot16(df,input)})
@@ -625,7 +625,7 @@ server <- function(input, output){
                       paste('plot-', Sys.Date(), '.html', sep='')
                     },
                     content = function(con) {
-                      htmlwidgets::saveWidget(as_widget(Plot18(df,input)), con)
+                      htmlwidgets::saveWidget(as_widget(Plot16(df,input)), con)
                     })
                 }
                 
