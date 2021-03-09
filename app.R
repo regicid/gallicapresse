@@ -35,16 +35,14 @@ Plot2 <- function(data,input){
 }
 Plot3 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$principaux_titres)
-  plot3<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_titres,colors="Dark2",hoverinfo="text")
-  plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot3<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
+  plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot3)
 }
 Plot4 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$principaux_titres)
-  plot4<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_titres,colors="Dark2",hoverinfo="text")
-  plot4<-layout(plot4, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot4<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
+  plot4<-layout(plot4, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot4)
 }
 Plot5 <- function(data,input){
@@ -69,16 +67,14 @@ Plot6 <- function(data,input){
 }
 Plot7 <- function(data,input){
   tableau = data[["tableau2"]]
-  tableau$hovers<-str_c(tableau$principales_villes)
-  plot7<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principales_villes,colors="Dark2",hoverinfo="text")
-  plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot7<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot7)
 }
 Plot8 <- function(data,input){
   tableau = data[["tableau2"]]
-  tableau$hovers<-str_c(tableau$principales_villes)
-  plot8<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principales_villes,colors="Dark2",hoverinfo="text")
-  plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot8<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
+  plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot8)
 }
 Plot9 <- function(data,input){
@@ -103,16 +99,14 @@ Plot10 <- function(data,input){
 }
 Plot11 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$principaux_themes)
-  plot11<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_themes,colors="Dark2",hoverinfo='text')
-  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot11<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions",type="date",tickformat = "%b %Y",tickangle="-45"),barmode="stack")
   return(plot11)
 }
 Plot12 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$principaux_themes)
-  plot12<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$principaux_themes,colors="Dark2",hoverinfo='text')
-  plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot12<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
+  plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot12)
 }
 Plot13<-function(data,input){
@@ -141,16 +135,14 @@ Plot15 <- function(data,input){
 }
 Plot16 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$is_quotidien)
-  plot16<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$is_quotidien,colors="Dark2",hoverinfo='text')
-  plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot16<-plot_ly(x=~tableau$date,type="histogram",color = tableau$is_quotidien,colors="Dark2")
+  plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot16)
 }
 Plot17 <- function(data,input){
   tableau = data[["tableau"]]
-  tableau$hovers<-str_c(tableau$is_quotidien)
-  plot17<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$is_quotidien,colors="Dark2",hoverinfo='text')
-  plot17<-layout(plot17, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot17<-plot_ly(x=~tableau$date,type="histogram",color = tableau$is_quotidien,colors="Dark2")
+  plot17<-layout(plot17, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot17)
 }
 
