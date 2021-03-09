@@ -155,10 +155,17 @@ Plot17 <- function(data,input){
 }
 
 
-prepare_data <- function(mot,from,to){
+prepare_data <- function(mot,dateRange){
   progress <- shiny::Progress$new()
   on.exit(progress$close())
   progress$set(message = "Patience...", value = 0)
+  
+  
+  from<-min(dateRange)
+  to<-max(dateRange)
+  from<-str_replace_all(as.character(from),"-","/")
+  to<-str_replace_all(as.character(to),"-","/")
+
   
   mot2 = str_replace_all(mot," ","%20")
   ###
@@ -181,8 +188,8 @@ prepare_data <- function(mot,from,to){
   page<-function(i)
   {
     
-    beginning=str_c(from,"/01/01")
-    end=str_c(to,"/12/31")
+    beginning=from
+    end=to
     url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
     
     read_xml(url)
@@ -261,7 +268,10 @@ prepare_data <- function(mot,from,to){
 }
 
 
-get_data<-function (tot_df,mot,from,to){
+get_data<-function (tot_df,mot,dateRange){
+  from<-as.character(min(dateRange))
+  to<-as.character(max(dateRange))
+  
   total<-tot_df
   total<-select(total,date,identifier,publisher,title,relation)
   total$relation<-str_remove_all(total$relation,".+-- ")
@@ -309,8 +319,8 @@ get_data<-function (tot_df,mot,from,to){
   total<-total[str_length(total$date)==10,]
   
   total$date<-as.Date.character(total$date)
-  borne1=as.Date.character(str_c(from,"-01-01"))
-  borne2=as.Date.character(str_c(to,"-12-31"))
+  borne1=from
+  borne2=to
   total<-total[total$date>=borne1 & total$date<=borne2,]
   total<-total[is.na(total$date)==FALSE,]
   total<-total[order(total$date),]
@@ -446,8 +456,10 @@ ui <- navbarPage("Gallicapresse",
                                           sidebarPanel(
                                             textInput("mot","Terme(s) à chercher","Abel Bonnard"),
                                             p('Utiliser "a+b" pour rechercher a OU b'),
-                                            numericInput("beginning","Début",1913),
-                                            numericInput("end","Fin",1914),
+                                            dateRangeInput('dateRange',
+                                                           label = '\n',
+                                                           start = as.Date.character("1913-01-01"), end = as.Date.character("1914-12-31"),
+                                                           separator="à", startview = "century"),
                                             actionButton("do","Générer le graphique"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
                                             downloadButton('downloadData', 'Télécharger les données')
@@ -479,6 +491,8 @@ ui <- navbarPage("Gallicapresse",
 
 # Define server logic required to draw a histogram
 server <- function(input, output){
+
+  
   #Fonction d'affichage :
   display<-function(df)
   {observeEvent(input$relative,
@@ -641,14 +655,14 @@ server <- function(input, output){
   
   #Affichage au démarrage :
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
-  df_exemple = reactive({get_data(tot_df,input$mot,input$beginning,input$end)})
+  df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange)})
   display(df_exemple())
   
   observeEvent(input$do,{
     datasetInput <- reactive({
       data$tableau})
-    tot_df=prepare_data(input$mot,input$beginning,input$end)
-    df = get_data(tot_df,input$mot,input$beginning,input$end)
+    tot_df=prepare_data(input$mot,input$dateRange)
+    df = get_data(tot_df,input$mot,input$dateRange)
     display(df)
     
     
