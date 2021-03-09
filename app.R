@@ -187,6 +187,10 @@ temps_traitement<-function(mot,dateRange){
   nmax <- as.integer(unlist(te$searchRetrieveResponse$numberOfRecords))
   traitement<-as.integer(nmax*0.0637168)
   traitement=seconds_to_period(traitement)
+  traitement=as.character(traitement)
+  traitement=str_replace_all(traitement,"M"," minutes")
+  traitement=str_replace_all(traitement,"S"," secondes")
+  traitement=str_replace_all(traitement,"H"," heures")
   message<-paste(nmax," numéros de presse trouvés. \nDélai de traitement estimé : ",traitement,".")
   return(message)
 }
