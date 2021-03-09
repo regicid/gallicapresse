@@ -10,6 +10,7 @@ library(shinythemes)
 library(tidyr)
 library(leaflet.extras)
 library(htmltools)
+library(lubridate)
 data = list()
 
 
@@ -146,6 +147,49 @@ Plot17 <- function(data,input){
   return(plot17)
 }
 
+temps_traitement<-function(mot,dateRange){
+  from<-min(dateRange)
+  to<-max(dateRange)
+  from<-str_replace_all(as.character(from),"-","/")
+  to<-str_replace_all(as.character(to),"-","/")
+  
+  
+  mot2 = str_replace_all(mot," ","%20")
+  ###
+  or<-""
+  or_end<-""
+  if(str_detect(mot2,"[+]")){
+    mots_or = str_split(mot2,"[+]")[[1]]
+    or1<-NA
+    or1_end<-NA
+    for (j in 2:length(mots_or)) {
+      
+      or1[j]<-str_c("or%20text%20adj%20%22",mots_or[j],"%22%20")
+      or1_end[j]<-str_c("%20",mots_or[j])
+      or<-str_c(or,or1[j])
+      or_end<-str_c(or_end,or1_end[j])
+    }
+    mot1<-mots_or[1]} else{mot1=mot2}
+  ###
+  i=1
+  page<-function(i)
+  {
+    
+    beginning=from
+    end=to
+    url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
+    
+    read_xml(url)
+  }
+  
+  tot <- page(1)
+  te <- xml2::as_list(tot)
+  nmax <- as.integer(unlist(te$searchRetrieveResponse$numberOfRecords))
+  traitement<-as.integer(nmax*0.0637168)
+  traitement=seconds_to_period(traitement)
+  message<-paste(nmax," numéros de presse trouvés. \nDélai de traitement estimé : ",traitement,".")
+  return(message)
+}
 
 prepare_data <- function(mot,dateRange){
   progress <- shiny::Progress$new()
@@ -452,12 +496,14 @@ ui <- navbarPage("Gallicapresse",
                                                            label = '\n',
                                                            start = as.Date.character("1913-01-01"), end = as.Date.character("1914-12-31"),
                                                            separator="à", startview = "century"),
-                                            actionButton("do","Générer le graphique"),
+                                            p(textOutput("message")),
+                                            actionButton("do","Générer les graphiques"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
                                             downloadButton('downloadData', 'Télécharger les données')
                                           ),
                                           
-                                          mainPanel(plotlyOutput("plot1"),
+                                          mainPanel(
+                                                    plotlyOutput("plot1"),
                                                     downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot2"),
                                                     downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
@@ -649,6 +695,10 @@ server <- function(input, output){
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
   df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange)})
   display(df_exemple())
+  
+  recherche<-reactive({input$mot})
+  duree<-reactive({input$dateRange})
+  output$message<-renderText(temps_traitement(recherche(),duree()))
   
   observeEvent(input$do,{
     datasetInput <- reactive({
