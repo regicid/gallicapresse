@@ -123,6 +123,38 @@ Plot13<-function(data,input){
     clusterOptions = markerClusterOptions(), popup = ~htmlEscape(paste(title," ", date,"\n",identifier)))
 }
 
+Plot14 <- function(data,input){
+  quotidiens = data[["quotidiens"]]
+  rownames(quotidiens)<-NULL
+  quotidiens$freq<-quotidiens$count/sum(quotidiens$count)
+  plot14<-plot_ly(x=~quotidiens$count,y=reorder(quotidiens$periodicite,quotidiens$count),type="bar")
+  plot14<-layout(plot14, title="Périodicité des journaux",xaxis=list(title="Nombre d'occurrences par catégorie"))
+  return(plot14)
+}
+Plot15 <- function(data,input){
+  quotidiens = data[["quotidiens"]]
+  rownames(quotidiens)<-NULL
+  quotidiens$freq<-quotidiens$count/sum(quotidiens$count)
+  plot15<-plot_ly(x=~quotidiens$freq,y=reorder(quotidiens$periodicite,quotidiens$freq),type="bar")
+  plot15<-layout(plot15, title="Périodicité des journaux",xaxis=list(title="Proportion d'occurrences par catégorie",tickformat = ".1%"))
+  return(plot15)
+}
+Plot16 <- function(data,input){
+  tableau = data[["tableau"]]
+  tableau$hovers<-str_c(tableau$is_quotidien)
+  plot16<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$is_quotidien,colors="Dark2",hoverinfo='text')
+  plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  return(plot16)
+}
+Plot17 <- function(data,input){
+  tableau = data[["tableau"]]
+  tableau$hovers<-str_c(tableau$is_quotidien)
+  plot17<-plot_ly(x=~tableau$date,type="histogram",text=~tableau$hovers,color = tableau$is_quotidien,colors="Dark2",hoverinfo='text')
+  plot17<-layout(plot17, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  return(plot17)
+}
+
+
 prepare_data <- function(mot,from,to){
   progress <- shiny::Progress$new()
   on.exit(progress$close())
@@ -347,8 +379,8 @@ get_data<-function (tot_df,mot,from,to){
   
   #####THEMES DES JOURNAUX
   liste<-read.csv("liste_journaux_gallica_quotidiens.csv",encoding = "UTF-8")
-  liste<-select(liste,ark,sdewey_nom,sdewey_nom2)
-  colnames(liste)<-c("relation","sdewey_nom","sdewey_nom2")
+  liste<-select(liste,ark,sdewey_nom,sdewey_nom2,is_quotidien)
+  colnames(liste)<-c("relation","sdewey_nom","sdewey_nom2","is_quotidien")
   total<-left_join(total,liste,"relation")
   total$sdewey_nom<-as.character(total$sdewey_nom)
   total$sdewey_nom[total$sdewey_nom==""]<-"N/A"
@@ -384,8 +416,24 @@ get_data<-function (tot_df,mot,from,to){
   geocodage<-read.csv("villes_geocodes.csv",encoding="UTF-8")
   total_bis<-left_join(total_bis,geocodage,"publisher")
   
-  data=list(total,presse,theme,total_bis,villes)
-  names(data) = c("tableau","presse","theme","tableau2","villes")
+  #Périodicité
+  total$is_quotidien<-as.character(total$is_quotidien)
+  total$is_quotidien[total$is_quotidien=="TRUE"]<-"Quotidien"
+  total$is_quotidien[total$is_quotidien=="FALSE"]<-"Autre périodicité"
+  total$is_quotidien<-as.factor(total$is_quotidien)
+  #####COMPTAGE DES QUOTIDIENS
+  quotidiens<-as.data.frame(unique(total$is_quotidien))
+  colnames(quotidiens)<-c("periodicite")
+  quotidiens$periodicite<-as.character(quotidiens$periodicite)
+  quotidiens$count<-NA
+  for (i in 1:length(quotidiens$periodicite)) 
+  {
+    quotidiens$count[i]<-sum(str_count(total$is_quotidien,quotidiens$periodicite[i]))
+  }
+  quotidiens<-quotidiens[order(quotidiens$count,decreasing = TRUE),]
+  
+  data=list(total,presse,theme,quotidiens,total_bis,villes)
+  names(data) = c("tableau","presse","theme","quotidiens","tableau2","villes")
   return(data)}
 
 
@@ -418,7 +466,11 @@ ui <- navbarPage("Gallicapresse",
                                                     plotlyOutput("plot5"),
                                                     downloadButton('downloadPlot5', 'Télécharger le graphique interactif'),
                                                     plotlyOutput("plot6"),
-                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif')
+                                                    downloadButton('downloadPlot6', 'Télécharger le graphique interactif'),
+                                                    plotlyOutput("plot8"),
+                                                    downloadButton('downloadPlot8', 'Télécharger le graphique interactif'),
+                                                    plotlyOutput("plot9"),
+                                                    downloadButton('downloadPlot9', 'Télécharger le graphique interactif')
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md"))
 )
@@ -484,6 +536,24 @@ server <- function(input, output){
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot12(df,input)), con)
                     })
+                  
+                  output$plot8 <- renderPlotly({Plot15(df,input)})
+                  output$downloadPlot8 <- downloadHandler(
+                    filename = function() {
+                      paste('plot-', Sys.Date(), '.html', sep='')
+                    },
+                    content = function(con) {
+                      htmlwidgets::saveWidget(as_widget(Plot15(df,input)), con)
+                    })
+                  
+                  output$plot9 <- renderPlotly({Plot17(df,input)})
+                  output$downloadPlot9 <- downloadHandler(
+                    filename = function() {
+                      paste('plot-', Sys.Date(), '.html', sep='')
+                    },
+                    content = function(con) {
+                      htmlwidgets::saveWidget(as_widget(Plot17(df,input)), con)
+                    })
                 }
                 else{
                   output$plot1 <- renderPlotly({Plot1(df,input)})
@@ -538,6 +608,24 @@ server <- function(input, output){
                     },
                     content = function(con) {
                       htmlwidgets::saveWidget(as_widget(Plot11(df,input)), con)
+                    })
+                  
+                  output$plot8 <- renderPlotly({Plot14(df,input)})
+                  output$downloadPlot8 <- downloadHandler(
+                    filename = function() {
+                      paste('plot-', Sys.Date(), '.html', sep='')
+                    },
+                    content = function(con) {
+                      htmlwidgets::saveWidget(as_widget(Plot16(df,input)), con)
+                    })
+                  
+                  output$plot9 <- renderPlotly({Plot16(df,input)})
+                  output$downloadPlot9 <- downloadHandler(
+                    filename = function() {
+                      paste('plot-', Sys.Date(), '.html', sep='')
+                    },
+                    content = function(con) {
+                      htmlwidgets::saveWidget(as_widget(Plot18(df,input)), con)
                     })
                 }
                 

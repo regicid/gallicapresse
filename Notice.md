@@ -17,8 +17,8 @@
 - La requête conditionnelle "OU" est disponible et s'effectue avec le signe "+" placé entre deux syntagmes.
 
 ## Données représentées
-- Gallicapresse représente la distribution chronologique des résultats de recherche selon trois variables d'intérêt : la ville de publication du journal, le titre de presse d'origine et la classification thématique de Dewey proposée par la BnF pour ce titre de presse.
-- Gallicapresse affiche aussi dans deux diagrammes distincts les valeurs les plus importantes : principaux titres de presse d'origine ; principales villes de publication des numéros retournés par la recherche ; principales thématiques de classement pour ces numéros.
+- Gallicapresse représente la distribution chronologique des résultats de recherche selon quatre variables d'intérêt : la ville de publication du journal, le titre de presse d'origine, la classification thématique de Dewey proposée par la BnF pour ce titre de presse et la périodicité des titres de presse.
+- Gallicapresse affiche aussi dans deux diagrammes distincts les valeurs les plus importantes : principaux titres de presse d'origine ; principales villes de publication des numéros retournés par la recherche ; principales thématiques de classement pour ces numéros ; périodicité.
 - Gallicapresse affiche par défaut ces résultats en valeur absolue. Une option permet l'affichage de ces mêmes analyses en valeurs relatives.
 - Une cartographie interactive permet la spatialisation des données. Attention : un même journal peut avoir plusieurs villes de publication différentes. Il est alors compté plusieurs fois sur les diagrammes géographiques ainsi que sur la cartographie.
 
