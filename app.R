@@ -11,6 +11,7 @@ library(tidyr)
 library(leaflet.extras)
 library(htmltools)
 library(lubridate)
+library(httr)
 data = list()
 
 
@@ -232,7 +233,7 @@ prepare_data <- function(mot,dateRange){
     end=to
     url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
     
-    read_xml(url)
+    read_xml(RETRY("GET",url,times = 6))
   }
   
   tot <- page(1)
