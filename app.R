@@ -487,11 +487,11 @@ get_data<-function (tot_df,mot,dateRange){
   names(data) = c("tableau","presse","theme","quotidiens","tableau2","villes")
   return(data)}
 
-# compteur<-read.csv("compteur.csv",encoding = "UTF-8")
-# a<-as.data.frame(cbind(as.character(Sys.Date()),1))
-# colnames(a)=c("date","count")
-# compteur<-rbind(compteur,a)
-# write.csv(compteur,"compteur.csv",fileEncoding = "UTF-8",row.names = FALSE)
+compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
+a<-as.data.frame(cbind(as.character(Sys.Date()),1))
+colnames(a)=c("date","count")
+compteur<-rbind(compteur,a)
+write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
 ui <- navbarPage("Gallicapresse",
                  tabPanel("Graphique",fluidPage(),
