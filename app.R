@@ -186,13 +186,13 @@ temps_traitement<-function(mot,dateRange){
   tot <- page(1)
   te <- xml2::as_list(tot)
   nmax <- as.integer(unlist(te$searchRetrieveResponse$numberOfRecords))
-  traitement<-as.integer(nmax*0.0637168)
+  traitement<-as.integer(nmax*(0.013+0.0225))
   traitement=seconds_to_period(traitement)
   traitement=as.character(traitement)
   traitement=str_replace_all(traitement,"M"," minutes")
   traitement=str_replace_all(traitement,"S"," secondes")
   traitement=str_replace_all(traitement,"H"," heures")
-  message<-paste(nmax," numéros de presse trouvés. \nDélai de traitement estimé : ",traitement,".")
+  message<-str_c(nmax," numéros de presse trouvés. \nDélai de traitement estimé : ",traitement,".")
   return(message)
 }
 
@@ -246,7 +246,7 @@ prepare_data <- function(mot,dateRange){
     }
     progress$inc(50/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
   }
-  progress$set(message = "Cette étape va être longue...", value = 0)
+  progress$set(message = "Traitement en cours ; cette étape va être longue...", value = 100)
   xml_to_df <- function(doc, ns = xml_ns(doc)) {
     split_by <- function(.x, .f, ...) {
       vals <- map(.x, .f, ...)
@@ -298,13 +298,16 @@ prepare_data <- function(mot,dateRange){
       tidyr::spread(var, value) %>% 
       select(-.name)
   }
-  h=1
-  tot_df<-h%>%parse_gallica
-  for (h in 2:nmax) {
-    ligne<-h%>%parse_gallica
-    tot_df<-bind_rows(tot_df,ligne)
-    progress$inc((1/nmax), detail = paste("Traitement des données",as.integer((h/nmax)*100),"%"))
-  }
+  # h=1
+  # tot_df<-h%>%parse_gallica
+  # for (h in 2:nmax) {
+  #   ligne<-h%>%parse_gallica
+  #   tot_df<-bind_rows(tot_df,ligne)
+  #   progress$inc((1/nmax), detail = paste("Traitement des données",as.integer((h/nmax)*100),"%"))
+  # }
+  tot_df <- 1:nmax %>% 
+    parse_gallica %>% 
+    bind_rows()
   return(tot_df)
 }
 
