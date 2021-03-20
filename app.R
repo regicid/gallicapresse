@@ -312,7 +312,7 @@ prepare_data <- function(mot,dateRange){
 }
 
 
-get_data<-function (tot_df,mot,dateRange){
+get_data<-function (tot_df,mot,dateRange,mois_pub){
   from<-as.character(min(dateRange))
   to<-as.character(max(dateRange))
   
@@ -360,6 +360,16 @@ get_data<-function (tot_df,mot,dateRange){
   for (i in 1:length(total$date)) {
     if (str_length(total$date[i])==7){total$date[i]<-str_c(total$date[i],"-01")}
   }
+  
+  if(mois_pub==FALSE){
+  for (i in 1:length(total$date)) {
+    if (str_length(total$date[i])==4)
+      {
+      total$date[i]<-str_c(total$date[i],"-01-01")
+      annee_seule<-bind_rows(annee_seule,total[i,])
+      }
+  }}
+  
   total<-total[str_length(total$date)==10,]
   
   total$date<-as.Date.character(total$date)
@@ -511,6 +521,7 @@ ui <- navbarPage("Gallicapresse",
                                             p(textOutput("message")),
                                             actionButton("do","Générer les graphiques"),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
+                                            checkboxInput("mois_pub", "Supprimer les numéros sans mois de publication enregistré", value = FALSE),
                                             radioButtons("structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 1),
                                             downloadButton('downloadData', 'Télécharger les données')
                                           ),
@@ -713,8 +724,10 @@ server <- function(input, output){
   
   #Affichage au démarrage :
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
-  df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange)})
-  display(df_exemple())
+  observeEvent(input$mois_pub,{
+    df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange,input$mois_pub)})
+    display(df_exemple())
+  })
   output$legende1=renderText("Source : gallica.bnf.fr")
   output$legende2=renderText("Affichage : Gallicapresse par Benjamin Azoulay et Benoît de Courson")
   output$legende3=renderText("Source : gallica.bnf.fr")
@@ -730,7 +743,8 @@ server <- function(input, output){
     datasetInput <- reactive({
       data$tableau})
     tot_df=prepare_data(input$mot,input$dateRange)
-    df = get_data(tot_df,input$mot,input$dateRange)
+    observeEvent(input$mois_pub,{
+    df = get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
     display(df)
     
     
@@ -741,7 +755,7 @@ server <- function(input, output){
       content = function(con) {
         write.csv(df$tableau, con, fileEncoding = "UTF-8",row.names = F)
       })
-  })
+  })})
   
   
   
