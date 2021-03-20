@@ -366,7 +366,6 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
     if (str_length(total$date[i])==4)
       {
       total$date[i]<-str_c(total$date[i],"-01-01")
-      annee_seule<-bind_rows(annee_seule,total[i,])
       }
   }}
   
