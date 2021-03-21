@@ -336,38 +336,20 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   
   
   #####COMPTAGE PAR TITRE DE PRESSE
-  presse<-as.data.frame(unique(total$title))
-  colnames(presse)<-c("titre")
-  presse$titre<-as.character(presse$titre)
+  presse<-total %>% 
+    group_by(title) %>%
+    summarise(count = length(title))
+  colnames(presse)<-c("titre","count")
   presse<-presse[presse$titre!="",]
-  presse<-as.data.frame(presse)
-  colnames(presse)<-c("titre")
   presse<-presse[presse$titre!=" ",]
-  presse<-as.data.frame(presse)
-  colnames(presse)<-c("titre")
   presse<-presse[is.na(presse$titre)==FALSE,]
-  presse<-as.data.frame(presse)
-  colnames(presse)<-c("titre")
-  presse$titre<-as.character(presse$titre)
-  presse$count<-NA
-  for (i in 1:length(presse$titre)) 
-  {
-    presse$count[i]<-sum(str_count(total$title,presse$titre[i]))
-  }
   presse<-presse[order(presse$count,decreasing = TRUE),]
   total$title<-as.factor(total$title)
   total$date<-as.character(total$date)  
-  for (i in 1:length(total$date)) {
-    if (str_length(total$date[i])==7){total$date[i]<-str_c(total$date[i],"-01")}
-  }
   
-  if(mois_pub==FALSE){
-  for (i in 1:length(total$date)) {
-    if (str_length(total$date[i])==4)
-      {
-      total$date[i]<-str_c(total$date[i],"-01-01")
-      }
-  }}
+  total$date[str_length(total$date)==7]<-str_c(total$date[str_length(total$date)==7],"-01")
+  if(mois_pub==FALSE){total$date[str_length(total$date)==4]<-str_c(total$date[str_length(total$date)==4],"-01-01")}
+  
   
   total<-total[str_length(total$date)==10,]
   
@@ -379,15 +361,8 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total<-total[order(total$date),]
   #####DETERMINATION DES PRINCIPAUX TITRES DE PRESSE
   top_titres<-slice_head(presse,n=10)
-  
   total$principaux_titres<-"Autre"
-  for (i in 1:length(total$title)) 
-  {
-    if(sum(as.numeric(total$title[i]==top_titres$titre))==1)
-    {
-      total$principaux_titres[i]<-as.character(total$title[i])
-    }
-  }
+  total$principaux_titres[is.element(total$title,top_titres$titre)]<-as.character(total$title[is.element(total$title,top_titres$titre)])
   total$principaux_titres<-as.factor(total$principaux_titres)
   
   #####COMPTAGE PAR VILLES
@@ -408,35 +383,26 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total_bis$publisher<-str_remove_all(total_bis$publisher,"\\]")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"\\[")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"@")
+  total_bis$publisher<-str_remove_all(total_bis$publisher,"\\?")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"^[:punct:]")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"$[:punct:]")
   total_bis$publisher<-iconv(total_bis$publisher,from="UTF-8",to="ASCII//TRANSLIT")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"^ ")
   total_bis$publisher<-str_remove_all(total_bis$publisher,"$ ")
+  total_bis<-total_bis[total_bis$publisher!="",]
   total_bis<-distinct(total_bis)
-  villes<-as.data.frame(unique(total_bis$publisher))
-  colnames(villes)<-c("city")
-  villes$city<-as.character(villes$city)
-  villes$count<-NA
-  for (i in 1:length(villes$city)) 
-  {
-    villes$count[i]<-sum(str_count(total_bis$publisher,villes$city[i]))
-  }
+  villes<-total_bis %>% 
+    group_by(publisher) %>%
+    summarise(count = length(publisher))
+  colnames(villes)<-c("city","count")
   villes<-villes[order(villes$count,decreasing = TRUE),]
   total_bis$publisher<-as.factor(total_bis$publisher)
   
   
   #####DETERMINATION DES PRINCIPALES VILLES
   top_villes<-slice_head(villes,n=10)
-  
   total_bis$principales_villes<-"Autre"
-  for (i in 1:length(total_bis$publisher)) 
-  {
-    if(sum(as.numeric(total_bis$publisher[i]==top_villes$city))==1)
-    {
-      total_bis$principales_villes[i]<-as.character(total_bis$publisher[i])
-    }
-  }
+  total_bis$principales_villes[is.element(total_bis$publisher,top_villes$city)]<-as.character(total_bis$publisher[is.element(total_bis$publisher,top_villes$city)])
   total_bis$principales_villes<-as.factor(total_bis$principales_villes)
   total_bis<-distinct(total_bis)
   
@@ -453,26 +419,15 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total$sdewey_nom<-as.factor(total$sdewey_nom)
   total$sdewey_nom2<-as.factor(total$sdewey_nom2)
   #####COMPTAGE PAR THEMATIQUE
-  theme<-as.data.frame(unique(total$sdewey_nom))
-  colnames(theme)<-c("thematique")
-  theme$thematique<-as.character(theme$thematique)
-  theme$count<-NA
-  for (i in 1:length(theme$thematique)) 
-  {
-    theme$count[i]<-sum(str_count(total$sdewey_nom,theme$thematique[i]))
-  }
+  theme<-total %>% 
+    group_by(sdewey_nom) %>%
+    summarise(count = length(sdewey_nom))
+  colnames(theme)<-c("thematique","count")
   theme<-theme[order(theme$count,decreasing = TRUE),]
   #####DETERMINATION DES PRINCIPAUX THEMES
   top_themes<-slice_head(theme,n=10)
-  
   total$principaux_themes<-"Autre"
-  for (i in 1:length(total$sdewey_nom)) 
-  {
-    if(sum(as.numeric(total$sdewey_nom[i]==top_themes$thematique))==1)
-    {
-      total$principaux_themes[i]<-as.character(total$sdewey_nom[i])
-    }
-  }
+  total$principaux_themes[is.element(total$sdewey_nom,top_themes$thematique)]<-as.character(total$sdewey_nom[is.element(total$sdewey_nom,top_themes$thematique)])
   total$principaux_themes<-as.factor(total$principaux_themes)
   
   #Ajout du géocodage
@@ -483,27 +438,25 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total$is_quotidien<-as.character(total$is_quotidien)
   total$is_quotidien[total$is_quotidien=="TRUE"]<-"Quotidien"
   total$is_quotidien[total$is_quotidien=="FALSE"]<-"Autre périodicité"
+  total$is_quotidien[is.na(total$is_quotidien)]<-"Autre périodicité"
   total$is_quotidien<-as.factor(total$is_quotidien)
   #####COMPTAGE DES QUOTIDIENS
-  quotidiens<-as.data.frame(unique(total$is_quotidien))
-  colnames(quotidiens)<-c("periodicite")
-  quotidiens$periodicite<-as.character(quotidiens$periodicite)
-  quotidiens$count<-NA
-  for (i in 1:length(quotidiens$periodicite)) 
-  {
-    quotidiens$count[i]<-sum(str_count(total$is_quotidien,quotidiens$periodicite[i]))
-  }
+  quotidiens<-total %>% 
+    group_by(is_quotidien) %>%
+    summarise(count = length(is_quotidien))
+  colnames(quotidiens)<-c("periodicite","count")
+  
   quotidiens<-quotidiens[order(quotidiens$count,decreasing = TRUE),]
   
   data=list(total,presse,theme,quotidiens,total_bis,villes)
   names(data) = c("tableau","presse","theme","quotidiens","tableau2","villes")
   return(data)}
 
-compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
-a<-as.data.frame(cbind(as.character(Sys.Date()),1))
-colnames(a)=c("date","count")
-compteur<-rbind(compteur,a)
-write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
+# compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
+# a<-as.data.frame(cbind(as.character(Sys.Date()),1))
+# colnames(a)=c("date","count")
+# compteur<-rbind(compteur,a)
+# write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
 ui <- navbarPage("Gallicapresse",
                  tabPanel("Graphique",fluidPage(),
