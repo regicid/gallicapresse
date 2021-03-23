@@ -480,19 +480,19 @@ ui <- navbarPage("Gallicapresse",
                                           
                                           mainPanel(
                                                     plotlyOutput("plot1"),
-                                                    downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
                                                     fluidRow(textOutput("legende1"),align="right"),
                                                     fluidRow(textOutput("legende2"),align="right"),
+                                                    downloadButton('downloadPlot1', 'Télécharger le graphique interactif'),
                                                     p(""),
                                                     plotlyOutput("plot2"),
-                                                    downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
                                                     fluidRow(textOutput("legende3"),align="right"),
                                                     fluidRow(textOutput("legende4"),align="right"),
+                                                    downloadButton('downloadPlot2', 'Télécharger le graphique interactif'),
                                                     p(""),
                                                     conditionalPanel(condition="input.structure==2",leafletOutput("plot7")),
-                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive')),
                                                     conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende5"),align="right")),
-                                                    conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende6"),align="right"))
+                                                    conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende6"),align="right")),
+                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive'))
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
                  tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
