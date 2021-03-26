@@ -458,6 +458,8 @@ colnames(a)=c("date","count")
 compteur<-rbind(compteur,a)
 write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
+options(shiny.maxRequestSize = 100*1024^2)
+
 ui <- navbarPage("Gallicapresse",
                  tabPanel("Graphique",fluidPage(),
                           tags$head(
@@ -472,10 +474,17 @@ ui <- navbarPage("Gallicapresse",
                                                            separator="à", startview = "century"),
                                             p(textOutput("message")),
                                             actionButton("do","Générer les graphiques"),
+                                            fileInput('target_upload','', 
+                                                      accept = c(
+                                                        'text/csv',
+                                                        'text/comma-separated-values',
+                                                        '.csv'
+                                                      ),buttonLabel='Importer', placeholder='un rapport de recherche'),
                                             checkboxInput("relative", "Afficher les résultats en valeurs relatives", value = FALSE),
                                             checkboxInput("mois_pub", "Supprimer les numéros sans mois de publication enregistré", value = FALSE),
                                             radioButtons("structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 1),
-                                            downloadButton('downloadData', 'Télécharger les données')
+                                            div(style="display: inline-block;vertical-align:bottom",downloadButton('downloadData', 'Télécharger les données')),
+                                            div(style="display: inline-block;vertical-align:bottom",downloadButton('downloadRR', 'Télécharger le rapport de recherche'))
                                           ),
                                           
                                           mainPanel(
@@ -690,11 +699,18 @@ server <- function(input, output){
   recherche<-reactive({input$mot})
   duree<-reactive({input$dateRange})
   output$message<-renderText(temps_traitement(recherche(),duree()))
+
   
-  observeEvent(input$do,{
-    datasetInput <- reactive({
-      data$tableau})
-    tot_df=prepare_data(input$mot,input$dateRange)
+  observeEvent(input$do,
+               {
+    datasetInput <- reactive({data$tableau})
+    if (is.null(input$target_upload)){
+      tot_df=prepare_data(input$mot,input$dateRange)
+      }
+    else{
+      inFile<-input$target_upload
+      tot_df<- read.csv(inFile$datapath, header = TRUE,sep = ",",encoding = "UTF-8")
+      }
     observeEvent(input$mois_pub,{
     df = get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
     display(df)
@@ -707,7 +723,17 @@ server <- function(input, output){
       content = function(con) {
         write.csv(df$tableau, con, fileEncoding = "UTF-8",row.names = F)
       })
-  })})
+    output$downloadRR <- downloadHandler(
+      filename = function() {
+        paste('rapport-', Sys.Date(), '.csv', sep='')
+      },
+      content = function(con) {
+        write.csv(tot_df, con, fileEncoding = "UTF-8",row.names = F)
+      })
+    })
+
+    }
+  )
   
   
   
