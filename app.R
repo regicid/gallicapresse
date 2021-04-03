@@ -313,7 +313,35 @@ prepare_data <- function(mot,dateRange){
   colnames(tot_df)<-c("URL d'accès au document","Type de document","Titre","Auteurs","Contributeur","Éditeurs","Date d'édition","Description","Nombre de Vues","Provenance","Droits","Ark Catalogue")
   return(tot_df)
 }
-
+gallica_search<-function(mot,dateRange){
+  from<-min(dateRange)
+  to<-max(dateRange)
+  from<-str_replace_all(as.character(from),"-","/")
+  to<-str_replace_all(as.character(to),"-","/")
+  
+  
+  mot2 = str_replace_all(mot," ","%20")
+  ###
+  or<-""
+  or_end<-""
+  if(str_detect(mot2,"[+]")){
+    mots_or = str_split(mot2,"[+]")[[1]]
+    or1<-NA
+    or1_end<-NA
+    for (j in 2:length(mots_or)) {
+      
+      or1[j]<-str_c("or%20text%20adj%20%22",mots_or[j],"%22%20")
+      or1_end[j]<-str_c("%20",mots_or[j])
+      or<-str_c(or,or1[j])
+      or_end<-str_c(or_end,or1_end[j])
+    }
+    mot1<-mots_or[1]} else{mot1=mot2}
+  ###
+  i=1
+  url<-str_c("https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",from,"%22%20and%20gallicapublication_date%3C=%22",to,"%22)&suggest=10&keywords=",mot1,or_end)
+  return(url)
+   
+}
 
 get_data<-function (tot_df,mot,dateRange,mois_pub){
   colnames(tot_df)<-str_remove_all(colnames(tot_df),"'")
@@ -477,7 +505,8 @@ ui <- navbarPage("Gallicapresse",
                                                            start = as.Date.character("1913-01-01"), end = as.Date.character("1914-12-31"),
                                                            separator="à", startview = "century"),
                                             p(textOutput("message")),
-                                            actionButton("do","Générer les graphiques"),
+                                            div(style="display: inline-block;vertical-align:bottom",actionButton("do","Générer les graphiques")),
+                                            div(style="display: inline-block;vertical-align:bottom",actionButton("gallica","Rechercher dans Gallica")),
                                             fileInput('target_upload','', 
                                                       accept = c(
                                                         'text/csv',
@@ -710,7 +739,13 @@ server <- function(input, output,session){
   recherche<-reactive({input$mot})
   duree<-reactive({input$dateRange})
   output$message<-renderText(temps_traitement(recherche(),duree()))
+# print(gallica_search(recherche(),duree()))
 
+  observeEvent(input$gallica,{
+                                    url<-gallica_search(recherche(),duree())
+                                    browseURL(url)
+                                  })
+  
   
   observeEvent(input$do,
                {
