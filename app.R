@@ -308,11 +308,21 @@ prepare_data <- function(mot,dateRange){
   tot_df <- 1:nmax %>% 
     parse_gallica %>% 
     bind_rows()
+  tot_df<-select(tot_df,identifier,type,title,creator,contributor,publisher,date,description,format,source,rights,relation)
+  tot_df$format<-str_remove_all(tot_df$format,"Nombre total de vues : ")
+  colnames(tot_df)<-c("URL d'accès au document","Type de document","Titre","Auteurs","Contributeur","Éditeurs","Date d'édition","Description","Nombre de Vues","Provenance","Droits","Ark Catalogue")
   return(tot_df)
 }
 
 
 get_data<-function (tot_df,mot,dateRange,mois_pub){
+  colnames(tot_df)<-str_remove_all(colnames(tot_df),"'")
+  colnames(tot_df)<-str_remove_all(colnames(tot_df),"\\.")
+  colnames(tot_df)<-str_remove_all(colnames(tot_df)," ")
+  colnames(tot_df)<-str_remove_all(colnames(tot_df),"XUFEFF")
+  colnames(tot_df)<-iconv(colnames(tot_df),from="UTF-8",to="ASCII//TRANSLIT")
+  tot_df<-select(tot_df,URLdaccesaudocument,Typededocument,Titre,Auteurs,Contributeur,Editeurs,Datededition,Description,NombredeVues,Provenance,Droits,ArkCatalogue)
+  colnames(tot_df)<-c("identifier","type","title","creator","contributor","publisher","date","description","format","source","rights","relation")
   from<-as.character(min(dateRange))
   to<-as.character(max(dateRange))
   
@@ -321,6 +331,7 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total$relation<-str_remove_all(total$relation,".+-- ")
   total$relation<-str_remove_all(total$relation,"https://gallica.bnf.fr/ark:/12148/")
   total$relation<-str_replace_all(total$relation,"/","_")
+  total$relation[str_detect(total$relation,"date",negate = TRUE)]<-str_c(total$relation[str_detect(total$relation,"date",negate = TRUE)],"_date")
   total$title<-str_replace(total$title,"-"," ")
   total$title<-str_remove_all(total$title,"[\\p{Punct}&&[^']].+")
   total$publisher<-str_replace_all(total$publisher,"-"," ")
@@ -334,7 +345,18 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   total$ark=str_remove_all(total$ark,"12148/")
   
   
+  total$date<-as.character(total$date)  
   
+  total$date[str_length(total$date)==7]<-str_c(total$date[str_length(total$date)==7],"-01")
+  if(mois_pub==FALSE){total$date[str_length(total$date)==4]<-str_c(total$date[str_length(total$date)==4],"-01-01")}
+  
+  
+  total<-total[str_length(total$date)==10,]
+  
+  total$date<-as.Date.character(total$date)
+  total<-total[total$date>=from & total$date<=to,]
+  total<-total[is.na(total$date)==FALSE,]
+  total<-total[order(total$date),]
   #####COMPTAGE PAR TITRE DE PRESSE
   presse<-total %>% 
     group_by(title) %>%
@@ -345,20 +367,7 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   presse<-presse[is.na(presse$titre)==FALSE,]
   presse<-presse[order(presse$count,decreasing = TRUE),]
   total$title<-as.factor(total$title)
-  total$date<-as.character(total$date)  
   
-  total$date[str_length(total$date)==7]<-str_c(total$date[str_length(total$date)==7],"-01")
-  if(mois_pub==FALSE){total$date[str_length(total$date)==4]<-str_c(total$date[str_length(total$date)==4],"-01-01")}
-  
-  
-  total<-total[str_length(total$date)==10,]
-  
-  total$date<-as.Date.character(total$date)
-  borne1=from
-  borne2=to
-  total<-total[total$date>=borne1 & total$date<=borne2,]
-  total<-total[is.na(total$date)==FALSE,]
-  total<-total[order(total$date),]
   #####DETERMINATION DES PRINCIPAUX TITRES DE PRESSE
   top_titres<-slice_head(presse,n=10)
   total$principaux_titres<-"Autre"
@@ -452,11 +461,11 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   names(data) = c("tableau","presse","theme","quotidiens","tableau2","villes")
   return(data)}
 
-compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
-a<-as.data.frame(cbind(as.character(Sys.Date()),1))
-colnames(a)=c("date","count")
-compteur<-rbind(compteur,a)
-write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
+# compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
+# a<-as.data.frame(cbind(as.character(Sys.Date()),1))
+# colnames(a)=c("date","count")
+# compteur<-rbind(compteur,a)
+# write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
 options(shiny.maxRequestSize = 100*1024^2)
 
@@ -684,7 +693,7 @@ server <- function(input, output){
   })}
   
   #Affichage au démarrage :
-  tot_df<-read.csv("exemple.csv",encoding = "UTF-8")
+  tot_df<-read.csv("exemple.csv",encoding = "UTF-8",sep=";")
   observeEvent(input$mois_pub,{
     df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange,input$mois_pub)})
     display(df_exemple())
@@ -709,7 +718,7 @@ server <- function(input, output){
       }
     else{
       inFile<-input$target_upload
-      tot_df<- read.csv(inFile$datapath, header = TRUE,sep = ",",encoding = "UTF-8")
+      tot_df<- read.csv(inFile$datapath, header = TRUE,sep = ";",encoding = "UTF-8")
       }
     observeEvent(input$mois_pub,{
     df = get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
@@ -728,7 +737,7 @@ server <- function(input, output){
         paste('rapport-', Sys.Date(), '.csv', sep='')
       },
       content = function(con) {
-        write.csv(tot_df, con, fileEncoding = "UTF-8",row.names = F)
+        write.table(tot_df, con, sep=";", fileEncoding = "UTF-8",row.names = F)
       })
     })
 
