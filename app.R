@@ -507,6 +507,7 @@ ui <- navbarPage("Gallicapresse",
                                             p(textOutput("message")),
                                             div(style="display: inline-block;vertical-align:bottom",actionButton("do","Générer les graphiques")),
                                             div(style="display: inline-block;vertical-align:bottom",actionButton("gallica","Ouvrir dans Gallica")),
+                                            uiOutput("ui_gallica"),
                                             fileInput('target_upload','', 
                                                       accept = c(
                                                         'text/csv',
@@ -739,13 +740,12 @@ server <- function(input, output,session){
   recherche<-reactive({input$mot})
   duree<-reactive({input$dateRange})
   output$message<-renderText(temps_traitement(recherche(),duree()))
-# print(gallica_search(recherche(),duree()))
 
-  observeEvent(input$gallica,{
-                                    url<-gallica_search(recherche(),duree())
-                                    browseURL(url)
-                                  })
-  
+  output$ui_gallica <- renderUI({
+    req(input$gallica > 0)
+    url<-gallica_search(recherche(),duree())
+    tags$script(HTML(paste0("window.open('",url, "', '_blank')")))
+  })
   
   observeEvent(input$do,
                {
