@@ -506,7 +506,7 @@ ui <- navbarPage("Gallicapresse",
                                                            separator="à", startview = "century"),
                                             p(textOutput("message")),
                                             div(style="display: inline-block;vertical-align:bottom",actionButton("do","Générer les graphiques")),
-                                            div(style="display: inline-block;vertical-align:bottom",actionButton("gallica","Rechercher dans Gallica")),
+                                            div(style="display: inline-block;vertical-align:bottom",actionButton("gallica","Recherche dans Gallica")),
                                             fileInput('target_upload','', 
                                                       accept = c(
                                                         'text/csv',
