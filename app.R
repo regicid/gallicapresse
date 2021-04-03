@@ -461,11 +461,6 @@ get_data<-function (tot_df,mot,dateRange,mois_pub){
   names(data) = c("tableau","presse","theme","quotidiens","tableau2","villes")
   return(data)}
 
-compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
-a<-as.data.frame(cbind(as.character(Sys.Date()),1))
-colnames(a)=c("date","count")
-compteur<-rbind(compteur,a)
-write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
 options(shiny.maxRequestSize = 100*1024^2)
 
@@ -510,7 +505,9 @@ ui <- navbarPage("Gallicapresse",
                                                     conditionalPanel(condition="input.structure==2",leafletOutput("plot7")),
                                                     conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende5"),align="right")),
                                                     conditionalPanel(condition="input.structure==2",fluidRow(textOutput("legende6"),align="right")),
-                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive'))
+                                                    conditionalPanel(condition="input.structure==2",downloadButton('downloadPlot7', 'Télécharger la carte interactive')),
+                                                    p(""),
+                                                    h2(textOutput("currentTime"), style="color:white")
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
                  tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
@@ -519,7 +516,12 @@ ui <- navbarPage("Gallicapresse",
 
 
 # Define server logic required to draw a histogram
-server <- function(input, output){
+server <- function(input, output,session){
+  
+  output$currentTime <- renderText({
+    invalidateLater(1000, session)
+    paste("The current time is", Sys.time())
+  })
 
   
   #Fonction d'affichage :
@@ -747,5 +749,12 @@ server <- function(input, output){
   
   
 }
+
+compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
+a<-as.data.frame(cbind(as.character(Sys.Date()),1))
+colnames(a)=c("date","count")
+compteur<-rbind(compteur,a)
+write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
+
 
 shinyApp(ui = ui, server = server)
