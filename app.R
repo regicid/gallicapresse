@@ -193,6 +193,7 @@ temps_traitement<-function(mot,dateRange){
   traitement=str_replace_all(traitement,"S"," secondes")
   traitement=str_replace_all(traitement,"H"," heures")
   message<-str_c(nmax," numéros de presse trouvés. \nDélai de traitement estimé : ",traitement,".")
+  if(nmax>30000){message<-str_c(message, " Téléchargez votre rapport de recherche depuis Gallica !")}
   return(message)
 }
 
@@ -505,7 +506,7 @@ ui <- navbarPage("Gallicapresse",
                                                            start = as.Date.character("1913-01-01"), end = as.Date.character("1914-12-31"),
                                                            separator="à", startview = "century"),
                                             p(textOutput("message")),
-                                            div(style="display: inline-block;vertical-align:bottom",actionButton("do","Générer les graphiques")),
+                                            conditionalPanel(condition = "(output.message.includes('Gallica')==false) || (output.target_upload==true)",div(style="display: inline-block;vertical-align:bottom",actionButton("do","Générer les graphiques"))),
                                             div(style="display: inline-block;vertical-align:bottom",actionButton("gallica","Ouvrir dans Gallica")),
                                             uiOutput("ui_gallica"),
                                             fileInput('target_upload','', 
@@ -746,6 +747,12 @@ server <- function(input, output,session){
     url<-gallica_search(recherche(),duree())
     tags$script(HTML(paste0("window.open('",url, "', '_blank')")))
   })
+  
+  
+  output$target_upload <- reactive({
+    return(!is.null(input$target_upload))
+  })
+  outputOptions(output, 'target_upload', suspendWhenHidden=FALSE)
   
   observeEvent(input$do,
                {
