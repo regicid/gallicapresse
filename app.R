@@ -788,7 +788,7 @@ server <- function(input, output,session){
     }
   )
   
-  
+  shinyOptions(progress.style="old")
   
 }
 
