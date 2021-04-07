@@ -549,7 +549,8 @@ ui <- navbarPage("Gallicapresse",
                                                        radioButtons("corpus_structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 4),
                                           ),
                                           mainPanel(
-                                                    uiOutput("corpus1")
+                                                    fluidRow(plotlyOutput("corpus1")),
+                                                    p("")
                                                     )
                                           )
                           ),
@@ -803,47 +804,71 @@ server <- function(input, output,session){
     
     if(input$corpus_relative==FALSE){
       if(input$corpus_structure==1){
-        return(includeHTML("plot3.html"))
+        p_titres<-read.csv("p_titres.csv",encoding = "UTF-8")
+        plot3<-plot_ly(p_titres,x=~as.integer(p_titres$date),y=~n,color=~principaux_titres,type='bar',colors="Dark2")
+        plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        return(plot3)
       }
       else if(input$corpus_structure==2){
-        return(includeHTML("plot7.html"))
+        p_villes<-read.csv("p_villes.csv",encoding = "UTF-8")
+        plot7<-plot_ly(p_villes,x=~as.integer(p_villes$date),y=~n,color=~principales_villes,type='bar',colors="Dark2")
+        plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        return(plot7)
       }
       else if(input$corpus_structure==3){
-        return(includeHTML("plot11.html"))
+        p_themes<-read.csv("p_themes.csv",encoding = "UTF-8")
+        plot11<-plot_ly(p_themes,x=~as.integer(p_themes$date),y=~n,color=~principaux_themes,type='bar',colors="Dark2")
+        plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        return(plot11)
       }
       else if(input$corpus_structure==4){
-        return(includeHTML("plot16.html"))
+        periodicite<-read.csv("periodicite.csv",encoding = "UTF-8")
+        plot16<-plot_ly(periodicite,x=~as.integer(periodicite$date),y=~n,color=~is_quotidien,type='bar',colors="Dark2")
+        plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        return(plot16)
       }
     }
     else if(input$corpus_relative==TRUE){
       if(input$corpus_structure==1){
-        return(includeHTML("plot4.html"))
+        p_titres<-read.csv("p_titres.csv",encoding = "UTF-8")
+        plot4<-plot_ly(p_titres,x=~as.integer(p_titres$date),y=~n,color=~principaux_titres,type='bar',colors="Dark2")
+        plot4<-layout(plot4, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4),title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        return(plot4)
       }
       else if(input$corpus_structure==2){
-        return(includeHTML("plot8.html"))
+        p_villes<-read.csv("p_villes.csv",encoding = "UTF-8")
+        plot8<-plot_ly(p_villes,x=~as.integer(p_villes$date),y=~n,color=~principales_villes,type='bar',colors="Dark2")
+        plot8<-layout(plot8, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        return(plot8)
       }
       else if(input$corpus_structure==3){
-        return(includeHTML("plot12.html"))
+        p_themes<-read.csv("p_themes.csv",encoding = "UTF-8")
+        plot12<-plot_ly(p_themes,x=~as.integer(p_themes$date),y=~n,color=~principaux_themes,type='bar',colors="Dark2")
+        plot12<-layout(plot12, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        return(plot12)
       }
       else if(input$corpus_structure==4){
-        return(includeHTML("plot17.html"))
+        periodicite<-read.csv("periodicite.csv",encoding = "UTF-8")
+        plot17<-plot_ly(periodicite,x=~as.integer(periodicite$date),y=~n,color=~is_quotidien,type='bar',colors="Dark2")
+        plot17<-layout(plot17, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent",bargap=0)
+        return(plot17)
       }
     }
 
   }
   observeEvent(input$corpus_structure,{observeEvent(input$corpus_relative,{
-    output$corpus1<-renderUI({corpus_display()})
+    output$corpus1<-renderPlotly({corpus_display()})
     })})
 
   shinyOptions(progress.style="old")
   
 }
 
-compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
-a<-as.data.frame(cbind(as.character(Sys.Date()),1))
-colnames(a)=c("date","count")
-compteur<-rbind(compteur,a)
-write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
+# compteur<-read.csv("/home/benjamin/Bureau/compteur_gallicapresse.csv",encoding = "UTF-8")
+# a<-as.data.frame(cbind(as.character(Sys.Date()),1))
+# colnames(a)=c("date","count")
+# compteur<-rbind(compteur,a)
+# write.csv(compteur,"/home/benjamin/Bureau/compteur_gallicapresse.csv",fileEncoding = "UTF-8",row.names = FALSE)
 
 
 shinyApp(ui = ui, server = server)
