@@ -38,13 +38,13 @@ Plot2 <- function(data,input){
 Plot3 <- function(data,input){
   tableau = data[["tableau"]]
   plot3<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
-  plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot3<-layout(plot3, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot3)
 }
 Plot4 <- function(data,input){
   tableau = data[["tableau"]]
   plot4<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_titres,colors="Dark2")
-  plot4<-layout(plot4, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot4<-layout(plot4, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot4)
 }
 Plot5 <- function(data,input){
@@ -70,13 +70,13 @@ Plot6 <- function(data,input){
 Plot7 <- function(data,input){
   tableau = data[["tableau2"]]
   plot7<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
-  plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot7<-layout(plot7, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot7)
 }
 Plot8 <- function(data,input){
   tableau = data[["tableau2"]]
   plot8<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principales_villes,colors="Dark2")
-  plot8<-layout(plot8, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot8<-layout(plot8, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot8)
 }
 Plot9 <- function(data,input){
@@ -102,13 +102,13 @@ Plot10 <- function(data,input){
 Plot11 <- function(data,input){
   tableau = data[["tableau"]]
   plot11<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
-  plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot11<-layout(plot11, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot11)
 }
 Plot12 <- function(data,input){
   tableau = data[["tableau"]]
   plot12<-plot_ly(x=~tableau$date,type="histogram",color = tableau$principaux_themes,colors="Dark2")
-  plot12<-layout(plot12, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot12<-layout(plot12, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot12)
 }
 Plot13<-function(data,input){
@@ -138,13 +138,13 @@ Plot15 <- function(data,input){
 Plot16 <- function(data,input){
   tableau = data[["tableau"]]
   plot16<-plot_ly(x=~tableau$date,type="histogram",color = tableau$is_quotidien,colors="Dark2")
-  plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
+  plot16<-layout(plot16, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack")
   return(plot16)
 }
 Plot17 <- function(data,input){
   tableau = data[["tableau"]]
   plot17<-plot_ly(x=~tableau$date,type="histogram",color = tableau$is_quotidien,colors="Dark2")
-  plot17<-layout(plot17, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
+  plot17<-layout(plot17, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",type="date",tickformat = "%b %Y",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent")
   return(plot17)
 }
 
@@ -541,6 +541,18 @@ ui <- navbarPage("Gallicapresse",
                                                     h2(textOutput("currentTime"), style="color:white")
                                           ))),
                  tabPanel("Notice",shiny::includeMarkdown("Notice.md")),
+                 tabPanel("Corpus",fluidPage(),
+                          tags$head(
+                            tags$style(HTML(".shiny-output-error-validation{color: red;}"))),
+                          pageWithSidebar(headerPanel(''),
+                                          sidebarPanel(checkboxInput("corpus_relative", "Afficher les résultats en valeurs relatives", value = FALSE),
+                                                       radioButtons("corpus_structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 4),
+                                          ),
+                                          mainPanel(
+                                                    uiOutput("corpus1")
+                                                    )
+                                          )
+                          ),
                  tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
 )
 
@@ -787,7 +799,42 @@ server <- function(input, output,session){
 
     }
   )
-  
+  corpus_display<-function() {
+    
+    if(input$corpus_relative==FALSE){
+      if(input$corpus_structure==1){
+        return(includeHTML("plot3.html"))
+      }
+      else if(input$corpus_structure==2){
+        return(includeHTML("plot7.html"))
+      }
+      else if(input$corpus_structure==3){
+        return(includeHTML("plot11.html"))
+      }
+      else if(input$corpus_structure==4){
+        return(includeHTML("plot16.html"))
+      }
+    }
+    else if(input$corpus_relative==TRUE){
+      if(input$corpus_structure==1){
+        return(includeHTML("plot4.html"))
+      }
+      else if(input$corpus_structure==2){
+        return(includeHTML("plot8.html"))
+      }
+      else if(input$corpus_structure==3){
+        return(includeHTML("plot12.html"))
+      }
+      else if(input$corpus_structure==4){
+        return(includeHTML("plot17.html"))
+      }
+    }
+
+  }
+  observeEvent(input$corpus_structure,{observeEvent(input$corpus_relative,{
+    output$corpus1<-renderUI({corpus_display()})
+    })})
+
   shinyOptions(progress.style="old")
   
 }
