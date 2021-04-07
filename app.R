@@ -545,8 +545,8 @@ ui <- navbarPage("Gallicapresse",
                           tags$head(
                             tags$style(HTML(".shiny-output-error-validation{color: red;}"))),
                           pageWithSidebar(headerPanel(''),
-                                          sidebarPanel(checkboxInput("corpus_relative", "Afficher les résultats en valeurs relatives", value = FALSE),
-                                                       radioButtons("corpus_structure", "Données à analyser :",choices = list("Titre de presse" = 1, "Ville de publication" = 2,"Classement thématique de Dewey" = 3,"Périodicité" = 4),selected = 4),
+                                          sidebarPanel(checkboxInput("corpus_relative_p", "Afficher les résultats en valeurs relatives", value = FALSE),
+                                                       radioButtons("corpus_structure_p", "Données à analyser :",choices = list("Ville de publication" = 2,"Droits d'auteur"=3,"Bibliothèque d'origine"=4, "Classement thématique de Dewey" = 5,"Périodicité" = 6,"Titre de presse" = 7),selected = 2),
                                           ),
                                           mainPanel(
                                                     fluidRow(plotlyOutput("corpus1")),
@@ -800,65 +800,89 @@ server <- function(input, output,session){
 
     }
   )
-  corpus_display<-function() {
+  corpus_display_p<-function() {
     
-    if(input$corpus_relative==FALSE){
-      if(input$corpus_structure==1){
+    if(input$corpus_relative_p==FALSE){
+      if(input$corpus_structure_p==7){
         p_titres<-read.csv("p_titres.csv",encoding = "UTF-8")
         plot3<-plot_ly(p_titres,x=~as.integer(p_titres$date),y=~n,color=~principaux_titres,type='bar',colors="Dark2")
-        plot3<-layout(plot3, title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        plot3<-layout(plot3, title="Distribution des numéros de presse en français \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
         return(plot3)
       }
-      else if(input$corpus_structure==2){
+      else if(input$corpus_structure_p==2){
         p_villes<-read.csv("p_villes.csv",encoding = "UTF-8")
         plot7<-plot_ly(p_villes,x=~as.integer(p_villes$date),y=~n,color=~principales_villes,type='bar',colors="Dark2")
-        plot7<-layout(plot7, title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        plot7<-layout(plot7, title="Distribution des numéros de presse en français \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
         return(plot7)
       }
-      else if(input$corpus_structure==3){
+      else if(input$corpus_structure_p==5){
         p_themes<-read.csv("p_themes.csv",encoding = "UTF-8")
         plot11<-plot_ly(p_themes,x=~as.integer(p_themes$date),y=~n,color=~principaux_themes,type='bar',colors="Dark2")
-        plot11<-layout(plot11, title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        plot11<-layout(plot11, title="Distribution des numéros de presse en français \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
         return(plot11)
       }
-      else if(input$corpus_structure==4){
+      else if(input$corpus_structure_p==6){
         periodicite<-read.csv("periodicite.csv",encoding = "UTF-8")
         plot16<-plot_ly(periodicite,x=~as.integer(periodicite$date),y=~n,color=~is_quotidien,type='bar',colors="Dark2")
-        plot16<-layout(plot16, title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de mentions"),barmode="stack",bargap=0)
+        plot16<-layout(plot16, title="Distribution des numéros de presse en français \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
         return(plot16)
       }
-    }
-    else if(input$corpus_relative==TRUE){
-      if(input$corpus_structure==1){
-        p_titres<-read.csv("p_titres.csv",encoding = "UTF-8")
-        plot4<-plot_ly(p_titres,x=~as.integer(p_titres$date),y=~n,color=~principaux_titres,type='bar',colors="Dark2")
-        plot4<-layout(plot4, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4),title="Distribution des mentions dans la presse française \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+      else if(input$corpus_structure_p==3){
+        p_droits<-read.csv("p_droits.csv",encoding = "UTF-8")
+        plot5<-plot_ly(p_droits,x=~date,y=~n,color=~rights,type='bar',colors="Dark2")
+        plot5<-layout(plot5, title="Distribution des numéros de presse en français \nselon leur régime juridique", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
+        return(plot5)
+      }
+      else if(input$corpus_structure_p==4){
+        p_sources<-read.csv("p_sources.csv",encoding = "UTF-8")
+        plot4<-plot_ly(p_sources,x=~date,y=~n,color=~principales_sources,type='bar',colors="Dark2")
+        plot4<-layout(plot4, title="Distribution des numéros de presse en français \nselon leur bibliothèque de numérisation d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Nombre de documents"),barmode="stack",bargap=0)
         return(plot4)
       }
-      else if(input$corpus_structure==2){
+    }
+    else if(input$corpus_relative_p==TRUE){
+      if(input$corpus_structure_p==7){
+        p_titres<-read.csv("p_titres.csv",encoding = "UTF-8")
+        plot4<-plot_ly(p_titres,x=~as.integer(p_titres$date),y=~n,color=~principaux_titres,type='bar',colors="Dark2")
+        plot4<-layout(plot4, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4),title="Distribution des numéros de presse en français \nselon le journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        return(plot4)
+      }
+      else if(input$corpus_structure_p==2){
         p_villes<-read.csv("p_villes.csv",encoding = "UTF-8")
         plot8<-plot_ly(p_villes,x=~as.integer(p_villes$date),y=~n,color=~principales_villes,type='bar',colors="Dark2")
-        plot8<-layout(plot8, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        plot8<-layout(plot8, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des numéros de presse en français \nselon la ville d'édition", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",bargap=0,barnorm="percent")
         return(plot8)
       }
-      else if(input$corpus_structure==3){
+      else if(input$corpus_structure_p==5){
         p_themes<-read.csv("p_themes.csv",encoding = "UTF-8")
         plot12<-plot_ly(p_themes,x=~as.integer(p_themes$date),y=~n,color=~principaux_themes,type='bar',colors="Dark2")
-        plot12<-layout(plot12, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",bargap=0,barnorm="percent")
+        plot12<-layout(plot12, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des numéros de presse en français \nselon le thème du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",bargap=0,barnorm="percent")
         return(plot12)
       }
-      else if(input$corpus_structure==4){
+      else if(input$corpus_structure_p==6){
         periodicite<-read.csv("periodicite.csv",encoding = "UTF-8")
         plot17<-plot_ly(periodicite,x=~as.integer(periodicite$date),y=~n,color=~is_quotidien,type='bar',colors="Dark2")
-        plot17<-layout(plot17, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des mentions dans la presse française \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des mentions pour chaque période"),barmode="stack",barnorm="percent",bargap=0)
+        plot17<-layout(plot17, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des numéros de presse en français \nselon la périodicité du journal d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",barnorm="percent",bargap=0)
         return(plot17)
       }
+      else if(input$corpus_structure_p==3){
+        p_droits<-read.csv("p_droits.csv",encoding = "UTF-8")
+        plot5<-plot_ly(p_droits,x=~date,y=~n,color=~rights,type='bar',colors="Dark2")
+        plot5<-layout(plot5, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des numéros de presse en français \nselon leur régime juridique", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",barnorm="percent",bargap=0)
+        return(plot5)
+      }
+      else if(input$corpus_structure_p==4){
+        p_sources<-read.csv("p_sources.csv",encoding = "UTF-8")
+        plot4<-plot_ly(p_sources,x=~date,y=~n,color=~principales_sources,type='bar',colors="Dark2")
+        plot4<-layout(plot4, margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4), title="Distribution des numéros de presse en français \nselon leur bibliothèque de numérisation d'origine", xaxis=list(title="Date",tickangle="-45"),yaxis=list(title="Part des documents à chaque période"),barmode="stack",barnorm="percent",bargap=0)
+        return(plot4)
+      }
     }
-
+    
   }
-  observeEvent(input$corpus_structure,{observeEvent(input$corpus_relative,{
-    output$corpus1<-renderPlotly({corpus_display()})
-    })})
+  observeEvent(input$corpus_structure_p,{observeEvent(input$corpus_relative_p,{
+    output$corpus1<-renderPlotly({corpus_display_p()})
+  })})
 
   shinyOptions(progress.style="old")
   
