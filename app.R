@@ -554,7 +554,7 @@ ui <- navbarPage("Gallicapresse",
                                                     )
                                           )
                           ),
-                 tabPanel(title=HTML("<li><a href='http://shiny.ens-paris-saclay.fr/gallicapresse/' target='_blank'>Gallicagram"))
+                 tabPanel(title=HTML("<li><a href='https://shiny.ens-paris-saclay.fr:443/gallicagram_app' target='_blank'>Gallicagram"))
 )
 
 
