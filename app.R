@@ -554,7 +554,7 @@ ui <- navbarPage("Gallicapresse",
                                                     )
                                           )
                           ),
-                 tabPanel(title=HTML("<li><a href='http://gallicagram.hopto.org:3838/gallicagram_app/' target='_blank'>Gallicagram"))
+                 tabPanel(title=HTML("<li><a href='http://shiny.ens-paris-saclay.fr/gallicapresse/' target='_blank'>Gallicagram"))
 )
 
 
