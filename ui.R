@@ -74,5 +74,5 @@ shinyUI(navbarPage("Gallicapresse",
                                             )
                             )
                    ),
-                   tabPanel(title=HTML("<li><a href='https://shiny.ens-paris-saclay.fr/gallicagram_app' target='_blank'>Gallicagram"))
+                   tabPanel(title=HTML("<li><a href='https://shiny.ens-paris-saclay.fr/app/gallicagram' target='_blank'>Gallicagram"))
 ))
