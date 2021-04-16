@@ -722,8 +722,10 @@ shinyServer(function(input, output,session){
                  }
                  observeEvent(input$mois_pub,{
                    df<- get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
-                   display(df)
-                   
+                   observeEvent(input$relative,
+                                {observeEvent(input$structure,
+                                              {display(df)})
+                                })                   
                    
                    output$downloadData <- downloadHandler(
                      filename = function() {
