@@ -673,9 +673,11 @@ shinyServer(function(input, output,session){
   
   #Affichage au démarrage :
   tot_df<-read.csv("exemple.csv",encoding = "UTF-8",sep=";")
+  exemple=TRUE
   observeEvent(input$mois_pub,{
-    df_exemple = reactive({get_data(tot_df,input$mot,input$dateRange,input$mois_pub)})
-    display(df_exemple())
+    if(exemple==TRUE){
+    df_exemple = get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
+    display(df_exemple)}
   })
   output$legende1=renderText("Source : gallica.bnf.fr")
   output$legende2=renderText("Affichage : Gallicapresse par Benjamin Azoulay et Benoît de Courson")
@@ -702,16 +704,16 @@ shinyServer(function(input, output,session){
   
   observeEvent(input$do,
                {
-                 datasetInput <- reactive({data$tableau})
+                 exemple=FALSE
                  if (is.null(input$target_upload)){
-                   tot_df=prepare_data(input$mot,input$dateRange)
+                   tot_df<-prepare_data(input$mot,input$dateRange)
                  }
                  else{
                    inFile<-input$target_upload
                    tot_df<- read.csv(inFile$datapath, header = TRUE,sep = ";",encoding = "UTF-8")
                  }
                  observeEvent(input$mois_pub,{
-                   df = get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
+                   df<- get_data(tot_df,input$mot,input$dateRange,input$mois_pub)
                    display(df)
                    
                    
