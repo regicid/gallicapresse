@@ -227,26 +227,34 @@ prepare_data <- function(mot,dateRange){
     mot1<-mots_or[1]} else{mot1=mot2}
   ###
   i=1
-  page<-function(i)
+  page<-function(i,maxR)
   {
     
     beginning=from
     end=to
-    url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=50&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
+    url<-str_c("https://gallica.bnf.fr/SRU?operation=searchRetrieve&exactSearch=true&maximumRecords=",maxR,"&startRecord=",i,"&collapsing=false&version=1.2&query=(dc.language%20all%20%22fre%22)%20and%20(text%20adj%20%22",mot1,"%22%20",or,")%20%20and%20(dc.type%20all%20%22fascicule%22)%20and%20(ocr.quality%20all%20%22Texte%20disponible%22)%20and%20(gallicapublication_date%3E=%22",beginning,"%22%20and%20gallicapublication_date%3C=%22",end,"%22)&suggest=10&keywords=",mot1,or_end)
     
-    read_xml(RETRY("GET",url,times = 6))
+    read_xml(RETRY("GET",url,times = 3))
   }
-  
-  tot <- page(1)
+  tot<-page(1,50)
   te <- xml2::as_list(tot)
   nmax <- as.integer(unlist(te$searchRetrieveResponse$numberOfRecords))
+  if(nmax<=50){tot <- page(1,5)
+  for (j in seq(6, nmax, by = 5)){
+    temp <- page(j,5)
+    for (l in xml2::xml_children(temp)){
+      xml2::xml_add_child(tot, l)
+    }
+    progress$inc(5/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
+  }}
+  if(nmax>50){
   for (j in seq(51, nmax, by = 50)){
-    temp <- page(j)
+    temp <- page(j,50)
     for (l in xml2::xml_children(temp)){
       xml2::xml_add_child(tot, l)
     }
     progress$inc(50/nmax, message = paste("Téléchargement en cours...",as.integer((j/nmax)*100),"%"))
-  }
+  }}
   progress$set(message = "Traitement en cours ; cette étape va être longue...", value = 100)
   xml_to_df <- function(doc, ns = xml_ns(doc)) {
     split_by <- function(.x, .f, ...) {
