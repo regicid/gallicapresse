@@ -510,7 +510,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot2(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('titres_r_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot2(df,input)), con)
@@ -519,7 +519,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot4(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('titres_r_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot4(df,input)), con)
@@ -529,7 +529,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot6(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('villes_r_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot6(df,input)), con)
@@ -538,7 +538,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot8(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('villes_r_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot8(df,input)), con)
@@ -548,7 +548,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot10(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('themes_r_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot10(df,input)), con)
@@ -557,7 +557,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot12(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('themes_r_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot12(df,input)), con)
@@ -567,7 +567,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot15(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('periodicite_r_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot15(df,input)), con)
@@ -576,7 +576,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot17(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('periodicite_r_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot17(df,input)), con)
@@ -586,7 +586,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot1(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('titres_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot1(df,input)), con)
@@ -595,7 +595,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot3(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('titres_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot3(df,input)), con)
@@ -605,7 +605,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot5(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('villes_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot5(df,input)), con)
@@ -614,7 +614,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot7(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('villes_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot7(df,input)), con)
@@ -622,7 +622,7 @@ shinyServer(function(input, output,session){
                                   output$plot7 <- renderLeaflet({Plot13(df,input)})
                                   output$downloadPlot7 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('carte_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot13(df,input)), con)
@@ -632,7 +632,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot9(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('themes_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot9(df,input)), con)
@@ -641,7 +641,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot11(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('themes_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot11(df,input)), con)
@@ -651,7 +651,7 @@ shinyServer(function(input, output,session){
                                   output$plot1 <- renderPlotly({Plot14(df,input)})
                                   output$downloadPlot1 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('periodicite_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot14(df,input)), con)
@@ -660,7 +660,7 @@ shinyServer(function(input, output,session){
                                   output$plot2 <- renderPlotly({Plot16(df,input)})
                                   output$downloadPlot2 <- downloadHandler(
                                     filename = function() {
-                                      paste('plot-', Sys.Date(), '.html', sep='')
+                                      paste('periodicite_d_', min(input$dateRange),"_",max(input$dateRange),"_",input$mot, '.html', sep='')
                                     },
                                     content = function(con) {
                                       htmlwidgets::saveWidget(as_widget(Plot16(df,input)), con)
