@@ -1,9 +1,9 @@
 # Notice de Gallicapresse
 
 - Gallicapresse est un programme représentant graphiquement la structure des résultats de recherches réalisées dans le corpus de presse de [Gallica](https://gallica.bnf.fr/).
-- Il vient en complément de l'outil [Gallicagram](http://gallicagram.hopto.org:3838/gallicagram_app/) et permet ainsi la maîtrise du corpus sous-jacent.
+- Il vient en complément de l'outil [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram) et permet ainsi la maîtrise du corpus sous-jacent.
 - Développé par [Benjamin Azoulay](mailto:benjamin.azoulay@ens-paris-saclay.fr) et [Benoît de Courson](https://regicid.github.io/), il est intégralement rédigé en langage [R](https://www.r-project.org/) et présente une interface graphique interactive [Shiny](https://shiny.rstudio.com/).
-- Les données produites et les graphiques interactifs sont téléchargeables par l’utilisateur. Le [code source](https://github.com/regicid/gallicapresse) de Gallicapresse est libre d'accès et de droits.
+- Les données produites et les graphiques interactifs sont téléchargeables par l’utilisateur. Le [code source](https://github.com/regicid/docker_gallicapresse) de Gallicapresse est libre d'accès et de droits.
 
 
 ## Extraction
@@ -27,4 +27,4 @@
 - Une cartographie interactive permet la spatialisation des données. Attention : un même journal peut avoir plusieurs villes de publication différentes. Il est alors compté plusieurs fois sur les diagrammes géographiques ainsi que sur la cartographie.
 
 ## Corpus
-- Se reporter à la notice de [Gallicagram](http://gallicagram.hopto.org:3838/gallicagram_app/)
+- Se reporter à la notice de [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram)
